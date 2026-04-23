@@ -1,0 +1,9 @@
+{
+    "name": "user/admin",
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    },
+    "require": {}
+}
