@@ -10,7 +10,7 @@ class authManager{
 
 
 
-    public function __construct($db,$data)
+    public function __construct(\App\Db\db $db,$data)
     {
         $this->db = $db;
         $this->login = $data['login'];

@@ -3,7 +3,6 @@ namespace App\Controllers;
 require_once __DIR__ . '/config.php';
 
 use App\db\db;
-use App\Dto\DTO;
 use App\Services\requestHandler;
 use App\Mappers\Mapper;
 use App\Services\validator;
@@ -46,10 +45,21 @@ class Controller
     private function renderError(Exception $e, int $httpCode, string $publicMessage): string
     {
         http_response_code($httpCode);
-        error_log($publicMessage . ': ' . $e->getMessage());
+
+        $errorData = [
+            'time'    => date('Y-m-d H:i:s'),
+            'level'   => 'critical',
+            'message' => 'unexpected err',
+            'details' => $e->getMessage(),
+            'code'    => $e->getCode(),
+            'file'    => $e->getFile(),
+            'line'    => $e->getLine(),
+        ];
+
+        error_log(json_encode($errorData, JSON_UNESCAPED_UNICODE));
 
         return json_encode([
-            'status' => 'error',
+            'status'  => 'error',
             'message' => $publicMessage
         ]);
     }

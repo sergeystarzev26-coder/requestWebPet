@@ -29,8 +29,18 @@ class db{
         $this->pdo = new PDO($dsn, $user, $pass, $options);
     }
     catch(PDOException $e){
-        error_log("критическая ошибка БД" . $e->getMessage());
-        throw new dbAdminErr("Сервис временно недоступен из-за проблем с БД.");
+        $errorData = [
+            'time'    => date('Y-m-d H:i:s'),
+            'level'   => 'critical',
+            'message' => 'db err',
+            'details' => $e->getMessage(),
+            'code'    => $e->getCode(),
+            'file'    => $e->getFile(),
+            'line'    => $e->getLine(),
+        ];
+
+        error_log(json_encode($errorData, JSON_UNESCAPED_UNICODE));
+        throw new dbAdminErr("dberror");
     }
  }
  public function getConnection(){

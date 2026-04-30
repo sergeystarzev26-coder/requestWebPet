@@ -1,17 +1,18 @@
 <?php
 namespace App\Services;
 
+use App\Dto\adminDto;
 use app\Exceptions\dbAdminErr;
 use PDO;
 use PDOException;
 use app\Exceptions\dbActionErr;
-
+use Exception;
 
 class adminManager
 {
     protected $db;
-
-    public function __construct($db)
+//менеджер операций берет данные о текущем действии пользователя и в заивисмости от него выполняет операцию с базой данных
+    public function __construct(\App\Db\db $db)
     {
         $this->db = $db;
     }
@@ -24,7 +25,7 @@ class adminManager
             $stmt = $this->db->getConnection()->prepare($sql);
 
             $stmt->execute();
-
+            /** @var \PDOStatement $stmt */
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         }
         catch (PDOException $e){
@@ -33,7 +34,7 @@ class adminManager
         }
     }
 
-    public function deleteRequest($adminDto)
+    public function deleteRequest(adminDto $adminDto)
     {
         try {
             $sql = 'DELETE FROM requests WHERE id = :id';
@@ -49,7 +50,7 @@ class adminManager
         }
     }
 
-    public function pauseRequest($adminDto)
+    public function pauseRequest(adminDto $adminDto)
     {
         try {
             $sql = 'UPDATE requests SET isPause = true WHERE id = :id';
@@ -63,7 +64,7 @@ class adminManager
         }
     }
 
-    public function unpauseRequest($adminDto)
+    public function unpauseRequest(adminDto $adminDto)
     {
         try{
             $sql = 'UPDATE requests
@@ -81,7 +82,7 @@ class adminManager
         }
     }
 
-    public function findRequest($adminDto)
+    public function findRequest(adminDto $adminDto)
     {
     try{
         $sql = 'SELECT *
@@ -95,9 +96,29 @@ class adminManager
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
     catch(PDOException $e){
-        error_log('Ошибка БД: ' . $e->getMessage());
-        throw new dbAdminErr('findRequests method err');
+        return $this->renderError($e, 403, 'dberror');
     }
+    }
+    private function renderError(Exception $e, int $httpCode, string $publicMessage): string
+    {
+        http_response_code($httpCode);
+
+        $errorData = [
+            'time'    => date('Y-m-d H:i:s'),
+            'level'   => 'critical',
+            'message' => 'unexpected err',
+            'details' => $e->getMessage(),
+            'code'    => $e->getCode(),
+            'file'    => $e->getFile(),
+            'line'    => $e->getLine(),
+        ];
+
+        error_log(json_encode($errorData, JSON_UNESCAPED_UNICODE));
+
+        return json_encode([
+            'status'  => 'error',
+            'message' => $publicMessage
+        ]);
     }
 }
 ?>

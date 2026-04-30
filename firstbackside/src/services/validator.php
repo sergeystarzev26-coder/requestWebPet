@@ -3,7 +3,8 @@ namespace App\Services;
 use App\Exceptions\ValidationException;
 
 class validator{
-
+//validation of data received from the handler. The method returns true or false.
+//при безуспешной валидации выбрасывает исключение с конкретикой данных в которой не прошла валидация
 public static function validateData(array $deviceData) : void {
 
         $brand = $deviceData['brand'] ?? '';
@@ -15,7 +16,6 @@ public static function validateData(array $deviceData) : void {
         if (!is_string($name) || empty($name) || mb_strlen($name) > 32) {
             throw new ValidationException('Incorrect deviceName');
         }
-
 
         $memory = $deviceData['memory_count'] ?? null;
         if (!is_numeric($memory) || $memory <= 0 || $memory > 4096) {

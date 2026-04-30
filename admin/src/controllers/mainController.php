@@ -38,8 +38,9 @@ class AdminController
             if (!rolechecker::checkIsadmin()) {
                 throw new RoleErr("Доступ запрещен");
             }
-
+        
             $dto = adminMapper::fromArray($data);
+            /** @var \App\Db\db $dbConnection */
             $manage = new adminManager($dbConnection);
             
             $response = ['status' => 'success'];
