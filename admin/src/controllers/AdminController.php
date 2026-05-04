@@ -40,7 +40,6 @@ class AdminController
             }
         
             $dto = adminMapper::fromArray($data);
-            /** @var \App\Db\db $dbConnection */
             $manage = new adminManager($dbConnection);
             
             $response = ['status' => 'success'];
@@ -88,7 +87,7 @@ class AdminController
             return $this->renderError($e, 500, 'database action error');
 
         } catch (dbAdminErr $e) {
-            return $this->renderError($e, 500, 'database connection error');
+            return $this->renderError($e, 500, 'database error');
 
         } catch (Exception $e) {
             return $this->renderError($e, 500, 'unexpected error');
@@ -99,7 +98,16 @@ class AdminController
     private function renderError(Exception $e, int $httpCode, string $publicMessage): string
     {
         http_response_code($httpCode);
-        error_log($publicMessage . ': ' . $e->getMessage());
+        $errorData = [
+            'time'    => date('Y-m-d H:i:s'),
+            'level'   => 'critical',
+            'message' => 'unexpected err',
+            'details' => $e->getMessage(),
+            'code'    => $e->getCode(),
+            'file'    => $e->getFile(),
+            'line'    => $e->getLine(),
+        ];
+        error_log($publicMessage . ': ' . $errorData());
         return json_encode([
             'status' => 'error', 
             'message' => $publicMessage

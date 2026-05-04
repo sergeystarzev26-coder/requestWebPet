@@ -2,6 +2,8 @@
 namespace App\Mappers;
 use App\Dto\DTO;
 class Mapper{
+
+//Маппер создает объект ДТО из уже валидных данных.в случаях пустых полей заполняет дефолтными значениями 
     public static function fromArray($deviceData) : DTO{
         return new DTO(
             brand:              (string)($deviceData['brand'] ?? ''),

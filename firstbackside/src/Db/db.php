@@ -11,9 +11,11 @@ use PDO;
 class db
 {
     private $pdo;
+    // метод создания подключения к БД. принимаиг ет как параметр конфигурацию из другого файла.
 
     public function __construct(array $config)
     {
+        //создание внутренних свойств на основе конфигурации чтобы постоянно не образщаться к параметру конфига
         $host = $config['db']['host'];
         $port = $config['db']['port'];
         $db = $config['db']['dbname'];
@@ -26,10 +28,11 @@ class db
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
             PDO::ATTR_EMULATE_PREPARES   => false,
         ];
-
+        //создание подключение к базе данных через блок try catch тк подключение к базе данных является хрупким процессом
         try {
-            $this->pdo = new PDO($dsn, $user, $pass, $options);
+            $this->pdo = new PDO( $dsn, $user, $pass, $options);
         } catch (PDOException $e) {
+            //в блоке catch используется error_log для логирования ошибок. для отслеживания трейса ошибки создается массив.
             $errorData = [
                 'time'    => date('Y-m-d H:i:s'),
                 'level'   => 'critical',
@@ -45,7 +48,7 @@ class db
         }
     }
 
-    public function getConnection()
+    public function getConnection() : PDO
     {
         return $this->pdo;
     }

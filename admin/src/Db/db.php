@@ -2,12 +2,12 @@
 namespace App\Db;
 use PDOException;
 require_once __DIR__ . '/config.php';
-use app\Exceptions\dbAdminErr;
-
+use App\Exceptions\dbAdminErr;
+use App\Db\DbInterface;
 
 use PDO;
 
-class db{
+class db implements DbInterface{
  private $pdo;
  
  public function __construct(array $config)

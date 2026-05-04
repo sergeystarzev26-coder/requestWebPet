@@ -11,7 +11,9 @@ use App\Exceptions\ValidationException;
 use App\Exceptions\DatabaseException;
 use Exception;
 
+//класс контроллера как входная точка бизнес логики
 class Controller
+// как параметры контроллер принимает только конфиг.все остальное располагается локально.
 {
     protected array $config;
 
@@ -19,7 +21,8 @@ class Controller
     {
         $this->config = $config;
     }
-
+//метод execute выполняет все необходимые методы в порядке:
+// получение данных->валидация->создание подключения к бд->выполнение операции->отчет в формате json
     public function execute(): string
     {
         try {
@@ -42,6 +45,7 @@ class Controller
         }
     }
 
+    //метод отчета ошибок.при возникновее в блоках catch вызывается метод и передаются параметры в зависимости от ошибок
     private function renderError(Exception $e, int $httpCode, string $publicMessage): string
     {
         http_response_code($httpCode);

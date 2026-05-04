@@ -2,17 +2,20 @@
 namespace App\Services;
 
 use App\Dto\adminDto;
-use app\Exceptions\dbAdminErr;
+use App\Exceptions\dbAdminErr;
+use App\Exceptions\dbActionErr;
+use App\Db\db;
 use PDO;
 use PDOException;
-use app\Exceptions\dbActionErr;
 use Exception;
+use App\Db\DbInterface;
 
 class adminManager
 {
     protected $db;
-//менеджер операций берет данные о текущем действии пользователя и в заивисмости от него выполняет операцию с базой данных
-    public function __construct(\App\Db\db $db)
+
+    // Менеджер операций берет данные о текущем действии пользователя и выполняет операцию с БД
+    public function __construct(DbInterface $db)
     {
         $this->db = $db;
     }
@@ -23,14 +26,11 @@ class adminManager
             $sql = 'SELECT * FROM requests ORDER BY created_at DESC';
             
             $stmt = $this->db->getConnection()->prepare($sql);
-
             $stmt->execute();
-            /** @var \PDOStatement $stmt */
+
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        }
-        catch (PDOException $e){
-            error_log('dberr: ' . $e->getMessage());
-            throw new dbActionErr('getAllRequests method err');
+        } catch (PDOException $e) {
+            return $this->renderError($e, 403, 'dberror');
         }
     }
 
@@ -40,13 +40,12 @@ class adminManager
             $sql = 'DELETE FROM requests WHERE id = :id';
 
             $stmt = $this->db->getConnection()->prepare($sql);
-
+            //данные для отправки в БД берутся из сформированного ДТО,как и во всем последующем коде
             $stmt->execute([
                 ':id' => $adminDto->id,
             ]);
         } catch (PDOException $e) {
-            error_log('db err: ' . $e->getMessage());
-            throw new dbAdminErr('deleteRequest method err');
+            return $this->renderError($e, 403, 'dberror');
         }
     }
 
@@ -54,51 +53,46 @@ class adminManager
     {
         try {
             $sql = 'UPDATE requests SET isPause = true WHERE id = :id';
+            
             $stmt = $this->db->getConnection()->prepare($sql);
             $stmt->execute([
                 ':id' => $adminDto->id
             ]);
         } catch (PDOException $e) {
-            error_log('db err: ' . $e->getMessage());
-            throw new dbAdminErr('pauseRequest method err');
+            return $this->renderError($e, 403, 'dberror');
         }
     }
 
     public function unpauseRequest(adminDto $adminDto)
     {
-        try{
-            $sql = 'UPDATE requests
-                    SET "isPause" = true
-                    WHERE id = :id';
+        try {
+            $sql = 'UPDATE requests SET "isPause" = false WHERE id = :id';
+            
             $stmt = $this->db->getConnection()->prepare($sql);
-
             $stmt->execute([
                 ':id' => $adminDto->id,
             ]);
-        }
-        catch(PDOException $e){
-            error_log('Ошибка БД: ' . $e->getMessage());
-            throw new dbAdminErr('unpauseRequest method err');
+        } catch (PDOException $e) {
+            return $this->renderError($e, 403, 'dberror');
         }
     }
 
     public function findRequest(adminDto $adminDto)
     {
-    try{
-        $sql = 'SELECT *
-                FROM requests
-                WHERE id = :id';
-        $stmt = $this->db->getConnection()->prepare($sql);
+        try {
+            $sql = 'SELECT * FROM requests WHERE id = :id';
+            
+            $stmt = $this->db->getConnection()->prepare($sql);
+            $stmt->execute([
+                ':id' => $adminDto->id,
+            ]);
 
-        $stmt->execute([
-            ':id' => $adminDto->id,
-        ]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            return $this->renderError($e, 403, 'dberror');
+        }
     }
-    catch(PDOException $e){
-        return $this->renderError($e, 403, 'dberror');
-    }
-    }
+
     private function renderError(Exception $e, int $httpCode, string $publicMessage): string
     {
         http_response_code($httpCode);
@@ -121,4 +115,3 @@ class adminManager
         ]);
     }
 }
-?>

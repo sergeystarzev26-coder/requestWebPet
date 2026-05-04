@@ -4,6 +4,7 @@ namespace App\Services;
 use App\Exceptions\inputErr;
 use Exception;
 class adminHandler{
+    //метод берет данные из php input и аналогично первому хендлеру преобразует это в асс.массив php
     public static function takeDataFromPost() {
         $rawData = file_get_contents('php://input');
         if (!json_validate($rawData)) {error_log('postdata != json'); throw new inputErr('postData != Json');}

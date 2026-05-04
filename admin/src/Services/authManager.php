@@ -1,6 +1,6 @@
 <?php
 namespace App\Services;
-use app\Exceptions\AuthErr;
+use App\Exceptions\AuthErr;
 use PDO;
 
 class authManager{
@@ -10,7 +10,7 @@ class authManager{
 
 
 
-    public function __construct(\App\Db\db $db,$data)
+    public function __construct(\App\Db\DbInterface $db, $data)
     {
         $this->db = $db;
         $this->login = $data['login'];
@@ -30,7 +30,17 @@ class authManager{
             }
         }
         catch(authErr $e){
-            error_log('AUTH ERROR'. $e->getMessage());
+            $errorData = [
+            'time'    => date('Y-m-d H:i:s'),
+            'level'   => 'critical',
+            'message' => 'auth err',
+            'details' => $e->getMessage(),
+            'code'    => $e->getCode(),
+            'file'    => $e->getFile(),
+            'line'    => $e->getLine(),
+        ];
+
+        error_log(json_encode($errorData, JSON_UNESCAPED_UNICODE));
             return false;
         }
         if (session_status() === PHP_SESSION_NONE) session_start();

@@ -17,6 +17,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     } catch (\Exception $e) {
         http_response_code(500);
+        $errorData = [
+            'time'    => date('Y-m-d H:i:s'),
+            'level'   => 'critical',
+            'message' => 'unexpected err',
+            'details' => $e->getMessage(),
+            'code'    => $e->getCode(),
+            'file'    => $e->getFile(),
+            'line'    => $e->getLine(),
+        ];
+
+        error_log(json_encode($errorData, JSON_UNESCAPED_UNICODE));
         echo json_encode([
             'status' => 'error',
             'message' => 'Critical system error'

@@ -1,7 +1,4 @@
 <?php
-namespace App\Dto;
-//readonly класс ДТО необходим чтобы ограничить изменения уже валидных данных.
-//так же объект ДТО нужен для более удобной работы с ним. сам объект создается в маппере
 readonly class DTO{
     public function __construct(
         public string $brand,
@@ -19,5 +16,6 @@ readonly class DTO{
         public bool   $isRepair
         )    
         {}
+        
 }
 ?>

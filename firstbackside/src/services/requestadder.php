@@ -15,36 +15,54 @@ class requestAdder {
     }
 // A method for adding data to a database. It uses DTO for more convenient work with received and already validated data.
 //блок try catch нужен для безопасности и контроля каждого запроса
-    public function addDataToDb(DTO $dto) {
+         public function addDataToDb(DTO $dto) {
         try {
-            $sql = 'INSERT INTO requests (
-                        devicebrand, name, devicememory, isnew, 
-                        batterycondition, casecondition, screencondition, 
-                        isworking, workingdescription, userphone, 
-                        username, equipment, isrepair
+            $sql = 'INSERT INTO public.requests (
+                        brand, 
+                        device, 
+                        memory_count, 
+                        is_new, 
+                        is_repair,
+                        battery_condition, 
+                        case_condition, 
+                        screen_condition, 
+                        is_working, 
+                        working_description, 
+                        equipment,
+                        phone, 
+                        name
                     ) VALUES (
-                        :brand, :device, :memory_count, :is_new, 
-                        :battery_condition, :case_condition, :screen_condition, 
-                        :is_working, :working_description, :phone, 
-                        :userName, :equipment, :is_repair
+                        :brand, 
+                        :device, 
+                        :memory_count, 
+                        :is_new, 
+                        :is_repair,
+                        :battery_condition, 
+                        :case_condition, 
+                        :screen_condition, 
+                        :is_working, 
+                        :working_description, 
+                        :equipment,
+                        :phone, 
+                        :name
                     )';
 
             $stmt = $this->db->getConnection()->prepare($sql);
 
             $stmt->execute([
                 ':brand'               => $dto->brand,
-                ':device'              => $dto->name,
+                ':device'              => $dto->name,             
                 ':memory_count'        => $dto->memory,
                 ':is_new'              => (int)$dto->isNew,
+                ':is_repair'           => (int)$dto->isRepair,
                 ':battery_condition'   => $dto->batteryCondition,
                 ':case_condition'      => $dto->caseCondition,
                 ':screen_condition'    => $dto->screenCondition,
                 ':is_working'          => (int)$dto->isWorking,
                 ':working_description' => $dto->workingDescription,
-                ':phone'               => $dto->userPhone,
-                ':userName'            => $dto->userName,
-                ':equipment'           => $dto->equipment,
-                ':is_repair'           => (int)$dto->isRepair
+                ':equipment'          => $dto->equipment,
+                ':phone'               => $dto->userPhone,        
+                ':name'                => $dto->userName           
             ]);
 
         } catch (PDOException $e) {
@@ -57,7 +75,6 @@ class requestAdder {
                 'file'    => $e->getFile(),
                 'line'    => $e->getLine(),
             ];
-            //логирование ошибок с помощью json и массива с еррор-трейсом
             error_log(json_encode($errorData, JSON_UNESCAPED_UNICODE));
             throw new DatabaseException('dbSaveInError');
         }
