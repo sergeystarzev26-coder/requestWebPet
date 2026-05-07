@@ -17,34 +17,45 @@ use Exception;
 class AdminController
 {
     private array $config;
+    private db $db;
+    private adminManager $manager;
 
-    public function __construct(array $config)
+    // Передаем всё необходимое через конструктор
+    public function __construct(array $config, db $db, adminManager $manager)
     {
         $this->config = $config;
+        $this->db = $db;
+        $this->manager = $manager;
     }
 
     public function execute(): string
     {
         try {
-            $dbConnection = new db($this->config);
-
+            // Используем подключение
+            $dbConnection = $this->db;
             $data = adminHandler::takeDataFromPost();
 
+            // Авторизация
             if (empty($_SESSION['auth']) && isset($data['login'], $data['pass'])) {
                 $auth = new authManager($dbConnection, $data);
                 $auth->auth();
             }
 
+            // Проверка прав
             if (!rolechecker::checkIsadmin()) {
                 throw new RoleErr("Доступ запрещен");
             }
         
             $dto = adminMapper::fromArray($data);
-            $manage = new adminManager($dbConnection);
             
+            // Используем уже имеющийся менеджер
+            $manage = $this->manager;
             $response = ['status' => 'success'];
 
-            switch ($data['action'] ?? 'list') {
+            // Определяем действие
+            $action = $data['action'] ?? 'list';
+
+            switch ($action) {
                 case 'delete':
                     $manage->deleteRequest($dto);
                     $response['message'] = 'delete complete';
@@ -75,42 +86,38 @@ class AdminController
                     break;
             }
 
-            return json_encode($response);
+            return json_encode($response, JSON_UNESCAPED_UNICODE);
 
         } catch (inputErr $e) {
             return $this->renderError($e, 400, 'data get err');
-
         } catch (RoleErr $e) {
             return $this->renderError($e, 403, 'forbidden');
-
         } catch (dbActionErr $e) {
             return $this->renderError($e, 500, 'database action error');
-
         } catch (dbAdminErr $e) {
             return $this->renderError($e, 500, 'database error');
-
         } catch (Exception $e) {
             return $this->renderError($e, 500, 'unexpected error');
         }
     }
 
-
     private function renderError(Exception $e, int $httpCode, string $publicMessage): string
     {
-        http_response_code($httpCode);
+        if (!headers_sent()) {
+            http_response_code($httpCode);
+        }
+        
         $errorData = [
             'time'    => date('Y-m-d H:i:s'),
             'level'   => 'critical',
-            'message' => 'unexpected err',
             'details' => $e->getMessage(),
-            'code'    => $e->getCode(),
-            'file'    => $e->getFile(),
-            'line'    => $e->getLine(),
         ];
-        error_log($publicMessage . ': ' . $errorData());
+        
+        error_log($publicMessage . ': ' . json_encode($errorData));
+        
         return json_encode([
             'status' => 'error', 
             'message' => $publicMessage
-        ]);
+        ], JSON_UNESCAPED_UNICODE);
     }
 }

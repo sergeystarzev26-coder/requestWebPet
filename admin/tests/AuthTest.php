@@ -5,7 +5,7 @@ use App\Services\authManager;
 
 
 
-class AuthManagerTest extends TestCase 
+class AuthTest extends TestCase 
 {
       protected function tearDown(): void
     {

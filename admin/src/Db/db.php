@@ -1,7 +1,6 @@
 <?php
 namespace App\Db;
 use PDOException;
-require_once __DIR__ . '/config.php';
 use App\Exceptions\dbAdminErr;
 use App\Db\DbInterface;
 

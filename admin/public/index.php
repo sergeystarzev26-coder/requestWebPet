@@ -5,32 +5,25 @@ require_once __DIR__ . '/../vendor/autoload.php';
 
 $config = require __DIR__ . '/../config/config.php';
 
-use app\Controllers\AdminController;
+use App\Controllers\AdminController;
+use App\Db\db;
+use App\Services\adminManager;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     header('Content-Type: application/json');
 
     try {
-        $controller = new AdminController($config);
+        $dbConnection = new db($config);
+        $manager = new adminManager($dbConnection);
+        $controller = new AdminController($config, $dbConnection, $manager);
         
         echo $controller->execute();
 
     } catch (\Exception $e) {
         http_response_code(500);
-        $errorData = [
-            'time'    => date('Y-m-d H:i:s'),
-            'level'   => 'critical',
-            'message' => 'unexpected err',
-            'details' => $e->getMessage(),
-            'code'    => $e->getCode(),
-            'file'    => $e->getFile(),
-            'line'    => $e->getLine(),
-        ];
-
-        error_log(json_encode($errorData, JSON_UNESCAPED_UNICODE));
         echo json_encode([
             'status' => 'error',
-            'message' => 'Critical system error'
+            'message' => 'Critical system error: ' . $e->getMessage()
         ]);
     }
 } else {
