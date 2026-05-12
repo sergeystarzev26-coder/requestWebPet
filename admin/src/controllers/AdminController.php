@@ -45,9 +45,9 @@ class AdminController
             if (!rolechecker::checkIsadmin()) {
                 throw new RoleErr("Доступ запрещен");
             }
-        
+
             $dto = adminMapper::fromArray($data);
-            
+
             // Используем уже имеющийся менеджер
             $manage = $this->manager;
             $response = ['status' => 'success'];
@@ -87,7 +87,6 @@ class AdminController
             }
 
             return json_encode($response, JSON_UNESCAPED_UNICODE);
-
         } catch (inputErr $e) {
             return $this->renderError($e, 400, 'data get err');
         } catch (RoleErr $e) {
@@ -106,17 +105,17 @@ class AdminController
         if (!headers_sent()) {
             http_response_code($httpCode);
         }
-        
+
         $errorData = [
             'time'    => date('Y-m-d H:i:s'),
             'level'   => 'critical',
             'details' => $e->getMessage(),
         ];
-        
+
         error_log($publicMessage . ': ' . json_encode($errorData));
-        
+
         return json_encode([
-            'status' => 'error', 
+            'status' => 'error',
             'message' => $publicMessage
         ], JSON_UNESCAPED_UNICODE);
     }

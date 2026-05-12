@@ -1,11 +1,15 @@
 <?php
+
 namespace App\Services;
+
 use App\Exceptions\ValidationException;
 
-class validator{
-//validation of data received from the handler. The method returns true or false.
-//при безуспешной валидации выбрасывает исключение с конкретикой данных в которой не прошла валидация
-public static function validateData(array $deviceData) : void {
+class validator
+{
+    //validation of data received from the handler. The method returns true or false.
+    //при безуспешной валидации выбрасывает исключение с конкретикой данных в которой не прошла валидация
+    public static function validateData(array $deviceData): void
+    {
 
         $brand = $deviceData['brand'] ?? '';
         if (!is_string($brand) || empty($brand) || mb_strlen($brand) > 16) {
@@ -67,7 +71,6 @@ public static function validateData(array $deviceData) : void {
 
         if (!isset($deviceData['is_repair']) || !is_bool($deviceData['is_repair'])) {
             throw new ValidationException('Incorrect isRepair');
-}   
+        }
+    }
 }
-}
-?>

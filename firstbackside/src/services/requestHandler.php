@@ -1,17 +1,30 @@
 <?php
-namespace App\Services;
-use App\Exceptions\HandlerException;
-class requestHandler{
 
-    //get JSON with device data from php input.also decodes data into an associative array
-    public static function takeDataFromPost() {
-        $rawData = file_get_contents('php://input');
-        if (!json_validate($rawData)) throw new HandlerException('postData != Json');
-        if(empty($rawData)){ throw new HandlerException('empty request');}
+namespace App\Services;
+
+use App\Exceptions\inputErr;
+use Exception;
+
+class requestHandler
+{
+    public static function takeDataFromPost(?string $source = null): array
+    {
+        $rawData = $source ?? file_get_contents('php://input');
+
+        if (empty($rawData)) {
+            throw new inputErr('empty request');
+        }
+
         $decodeData = json_decode($rawData, true);
-        if($decodeData === null) throw new HandlerException('json_decodes returns NULL');
-        $deviceData = $decodeData;
-        return is_array($deviceData) ? $deviceData : throw new HandlerException('decode Data error');
+
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new inputErr('postData != Json');
+        }
+
+        if ($decodeData === null || !is_array($decodeData)) {
+            throw new inputErr('invalid json structure');
+        }
+
+        return $decodeData;
     }
 }
-?>

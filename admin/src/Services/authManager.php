@@ -1,9 +1,12 @@
 <?php
+
 namespace App\Services;
+
 use App\Exceptions\AuthErr;
 use PDO;
 
-class authManager{
+class authManager
+{
     protected $db;
     protected $login;
     protected $pass;
@@ -16,31 +19,31 @@ class authManager{
         $this->login = $data['login'];
         $this->pass = $data['pass'];
     }
-    public function auth(){
+    public function auth()
+    {
         $sql = 'SELECT login, password_hash FROM admins WHERE login = :login';
-        try{
+        try {
             $conn = $this->db->getConnection();
             $stmt = $conn->prepare($sql);
             $succ = $stmt->execute(['login' => $this->login]);
-            if($succ){
+            if ($succ) {
                 $res = $stmt->fetch(PDO::FETCH_ASSOC);
-                if(!$res || !password_verify(($this->pass), $res['password_hash'])){
+                if (!$res || !password_verify(($this->pass), $res['password_hash'])) {
                     throw new authErr('verif err');
                 }
             }
-        }
-        catch(authErr $e){
+        } catch (authErr $e) {
             $errorData = [
-            'time'    => date('Y-m-d H:i:s'),
-            'level'   => 'critical',
-            'message' => 'auth err',
-            'details' => $e->getMessage(),
-            'code'    => $e->getCode(),
-            'file'    => $e->getFile(),
-            'line'    => $e->getLine(),
-        ];
+                'time'    => date('Y-m-d H:i:s'),
+                'level'   => 'critical',
+                'message' => 'auth err',
+                'details' => $e->getMessage(),
+                'code'    => $e->getCode(),
+                'file'    => $e->getFile(),
+                'line'    => $e->getLine(),
+            ];
 
-        error_log(json_encode($errorData, JSON_UNESCAPED_UNICODE));
+            error_log(json_encode($errorData, JSON_UNESCAPED_UNICODE));
             return false;
         }
         if (session_status() === PHP_SESSION_NONE) session_start();
@@ -50,6 +53,3 @@ class authManager{
         return true;
     }
 }
-
-
-?>

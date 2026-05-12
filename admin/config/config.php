@@ -19,7 +19,7 @@ return [
         'user'   => $_ENV['DB_USER'] ?? '',
         'pass'   => $_ENV['DB_PASS'] ?? '',
     ],
-    
+
     'app' => [
         'debug'     => (bool)($_ENV['APP_DEBUG'] ?? true),
         'logs_path' => __DIR__ . '/logs.txt',

@@ -1,15 +1,17 @@
 <?php
+
 namespace App\Services;
 
 use App\Exceptions\inputErr;
 use Exception;
 
-class adminHandler {
-    
-    public static function takeDataFromPost(?string $source = null) {
+class adminHandler
+{
+
+    public static function takeDataFromPost(?string $source = null)
+    {
         try {
             $rawData = $source ?? file_get_contents('php://input');
-
             if (empty($rawData)) {
                 throw new inputErr('empty request');
             }
@@ -29,7 +31,6 @@ class adminHandler {
             }
 
             return $decodeData;
-
         } catch (inputErr $e) {
             return self::renderError($e, 403, 'incorrect data');
         } catch (\PDOException $e) {

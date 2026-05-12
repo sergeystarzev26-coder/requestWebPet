@@ -1,17 +1,15 @@
 <?php
+
 use PHPUnit\Framework\TestCase;
 use App\Services\authManager;
 
-
-
-
-class AuthTest extends TestCase 
+class AuthTest extends TestCase
 {
-      protected function tearDown(): void
+    protected function tearDown(): void
     {
         $_SESSION = [];
     }
-   /**
+    /**
      * @runInSeparateProcess
      * @preserveGlobalState disabled
      */
@@ -22,16 +20,16 @@ class AuthTest extends TestCase
         $stmtMock = $this->createMock(\PDOStatement::class);
         $stmtMock->method('execute')->willReturn(true);
         $stmtMock->method('fetch')->willReturn([
-                     'login' => 'admin',
-                     'password_hash' => password_hash('my_password', PASSWORD_DEFAULT)
-                 ]);
+            'login' => 'admin',
+            'password_hash' => password_hash('my_password', PASSWORD_DEFAULT)
+        ]);
         $pdoMock = $this->createMock(\PDO::class);
         $pdoMock->method('prepare')->willReturn($stmtMock);
-        
-        $dbmock = $this->createMock(\App\Db\DbInterface::class); 
+
+        $dbmock = $this->createMock(\App\Db\DbInterface::class);
         $dbmock->method('getConnection')->willReturn($pdoMock);
 
-         if (session_status() === PHP_SESSION_NONE) {
+        if (session_status() === PHP_SESSION_NONE) {
             @session_start();
         }
 
@@ -42,8 +40,6 @@ class AuthTest extends TestCase
         $this->assertTrue($result, "Авторизация должна пройти успешно");
         $this->assertEquals('admin', $_SESSION['user_login']);
         $this->assertEquals('1', $_SESSION['is_admin']);
-
-
     }
     /**
      * @runInSeparateProcess
@@ -56,16 +52,16 @@ class AuthTest extends TestCase
         $stmtMock = $this->createMock(\PDOStatement::class);
         $stmtMock->method('execute')->willReturn(true);
         $stmtMock->method('fetch')->willReturn([
-                     'login' => 'admin',
-                     'password_hash' => password_hash('my_password', PASSWORD_DEFAULT)
-                 ]);
+            'login' => 'admin',
+            'password_hash' => password_hash('my_password', PASSWORD_DEFAULT)
+        ]);
         $pdoMock = $this->createMock(\PDO::class);
         $pdoMock->method('prepare')->willReturn($stmtMock);
-        
-        $dbmock = $this->createMock(\App\Db\DbInterface::class); 
+
+        $dbmock = $this->createMock(\App\Db\DbInterface::class);
         $dbmock->method('getConnection')->willReturn($pdoMock);
 
-         if (session_status() === PHP_SESSION_NONE) {
+        if (session_status() === PHP_SESSION_NONE) {
             @session_start();
         }
 
@@ -75,7 +71,5 @@ class AuthTest extends TestCase
         $result = $authservice->auth();
         $this->assertFalse($result, "Авторизация должна не пройти");
         $this->assertArrayNotHasKey('auth', $_SESSION);
-
     }
 }
-

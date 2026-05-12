@@ -3,16 +3,20 @@ require_once __DIR__ . '/vendor/autoload.php';
 $config = require_once __DIR__ . '/config.php';
 
 use App\controllers\Controller;
+use App\Services\requestAdder;
+use App\Db\db;
+
 //Входная публичная точка входа.вызывает контроллер и отдает результат в формате JSON
 try {
-    $controller = new Controller($config);
+    $db = new db($config['db']);
+    $requestAdder = new requestAdder($db);
+    $controller = new Controller($config, $db, $requestAdder);
 
     $response = $controller->execute();
 
     header('Content-Type: application/json');
 
     echo $response;
-
 } catch (\Exception $e) {
     //отдаю код на фронтенд при ошибке.
     http_response_code(500);

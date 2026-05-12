@@ -1,11 +1,15 @@
 <?php
+
 use App\Services\rolechecker;
 use PHPUnit\Framework\TestCase;
-class roleCheckerTest extends TestCase{
-     /**
+
+class roleCheckerTest extends TestCase
+{
+    /**
      * @runInSeparateProcess
      */
-    public function testRoleCheck(){
+    public function testRoleCheck()
+    {
         if (session_status() === PHP_SESSION_NONE) {
             @session_start();
         }
@@ -13,10 +17,11 @@ class roleCheckerTest extends TestCase{
         $_SESSION['auth'] = true;
         $this->assertTrue(rolechecker::checkIsadmin());
     }
-     /**
+    /**
      * @runInSeparateProcess
      */
-    public function testRoleCheckException(){
+    public function testRoleCheckException()
+    {
         if (session_status() === PHP_SESSION_NONE) {
             @session_start();
         }

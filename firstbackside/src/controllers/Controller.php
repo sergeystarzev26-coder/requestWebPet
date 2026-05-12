@@ -1,5 +1,7 @@
 <?php
+
 namespace App\Controllers;
+
 require_once __DIR__ . '/config.php';
 
 use App\db\db;
@@ -17,12 +19,18 @@ class Controller
 {
     protected array $config;
 
-    public function __construct($config)
+    protected db $db;
+
+    protected requestAdder $requestAdder;
+
+    public function __construct(array $config, db $db, requestAdder $requestAdder)
     {
         $this->config = $config;
+        $this->db = $db;
+        $this->requestAdder = $requestAdder;
     }
-//метод execute выполняет все необходимые методы в порядке:
-// получение данных->валидация->создание подключения к бд->выполнение операции->отчет в формате json
+    //метод execute выполняет все необходимые методы в порядке:
+    // получение данных->валидация->создание подключения к бд->выполнение операции->отчет в формате json
     public function execute(): string
     {
         try {
@@ -30,12 +38,11 @@ class Controller
             validator::validateData($data);
             $dto = Mapper::fromArray($data);
 
-            $dbConnection = new db($this->config['db']);
-            $requestAdder = new RequestAdder($dbConnection);
+            $dbConnection = $this->db;
+            $requestAdder = $this->requestAdder;
             $requestAdder->addDataToDb($dto);
 
             return json_encode(['status' => 'success']);
-
         } catch (ValidationException $e) {
             return $this->renderError($e, 403, 'incorrect data');
         } catch (DatabaseException $e) {

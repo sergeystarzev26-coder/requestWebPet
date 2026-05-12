@@ -1,21 +1,27 @@
 <?php
+
 namespace App\Services;
+
 use App\Dto\DTO;
 use App\Db\db;
+use App\Db\DbInterface;
 use PDO;
 use PDOException;
 use App\Exceptions\DatabaseException;
 
-class requestAdder {
-//свойство защищено чтобы ограничить область использование объекта ПДО
+class requestAdder
+{
+    //свойство защищено чтобы ограничить область использование объекта ПДО
     protected $db;
-// The resulting database object is used in the constructor for subsequent DB methods.
-    public function __construct(DB $db) {
+    // The resulting database object is used in the constructor for subsequent DB methods.
+    public function __construct(DbInterface $db)
+    {
         $this->db = $db;
     }
-// A method for adding data to a database. It uses DTO for more convenient work with received and already validated data.
-//блок try catch нужен для безопасности и контроля каждого запроса
-         public function addDataToDb(DTO $dto) {
+    // A method for adding data to a database. It uses DTO for more convenient work with received and already validated data.
+    //блок try catch нужен для безопасности и контроля каждого запроса
+    public function addDataToDb(DTO $dto)
+    {
         try {
             $sql = 'INSERT INTO public.requests (
                         brand, 
@@ -51,7 +57,7 @@ class requestAdder {
 
             $stmt->execute([
                 ':brand'               => $dto->brand,
-                ':device'              => $dto->name,             
+                ':device'              => $dto->name,
                 ':memory_count'        => $dto->memory,
                 ':is_new'              => (int)$dto->isNew,
                 ':is_repair'           => (int)$dto->isRepair,
@@ -61,10 +67,9 @@ class requestAdder {
                 ':is_working'          => (int)$dto->isWorking,
                 ':working_description' => $dto->workingDescription,
                 ':equipment'          => $dto->equipment,
-                ':phone'               => $dto->userPhone,        
-                ':name'                => $dto->userName           
+                ':phone'               => $dto->userPhone,
+                ':name'                => $dto->userName
             ]);
-
         } catch (PDOException $e) {
             $errorData = [
                 'time'    => date('Y-m-d H:i:s'),

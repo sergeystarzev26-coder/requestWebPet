@@ -16,9 +16,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $dbConnection = new db($config);
         $manager = new adminManager($dbConnection);
         $controller = new AdminController($config, $dbConnection, $manager);
-        
-        echo $controller->execute();
 
+        echo $controller->execute();
     } catch (\Exception $e) {
         http_response_code(500);
         echo json_encode([

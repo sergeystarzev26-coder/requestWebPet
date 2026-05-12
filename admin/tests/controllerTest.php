@@ -1,4 +1,5 @@
 <?php
+
 use PHPUnit\Framework\TestCase;
 use Mockery as m;
 use App\Controllers\AdminController;
