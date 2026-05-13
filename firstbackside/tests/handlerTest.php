@@ -36,7 +36,7 @@ class HandlerTest extends TestCase
     public function testTakeDataEmpty()
     {
         // Говорим PHPUnit, что мы ждем ошибку inputErr
-        $this->expectException(\App\Exceptions\inputErr::class);
+        $this->expectException(\App\Exceptions\HandlerException::class);
         $this->expectExceptionMessage('empty request');
 
         // Вызываем метод. Код после этой строчки не выполнится, 
@@ -47,7 +47,7 @@ class HandlerTest extends TestCase
     // Тестируем битый JSON
     public function testTakeDataInvalidJson()
     {
-        $this->expectException(\App\Exceptions\inputErr::class);
+        $this->expectException(\App\Exceptions\HandlerException::class);
         $this->expectExceptionMessage('postData != Json');
 
         requestHandler::takeDataFromPost('{ "brand": 123, broken... }');

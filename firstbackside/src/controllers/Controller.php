@@ -5,6 +5,7 @@ namespace App\Controllers;
 require_once __DIR__ . '/config.php';
 
 use App\db\db;
+use App\Db\DbInterface;
 use App\Services\requestHandler;
 use App\Mappers\Mapper;
 use App\Services\validator;
@@ -15,7 +16,6 @@ use Exception;
 
 //класс контроллера как входная точка бизнес логики
 class Controller
-// как параметры контроллер принимает только конфиг.все остальное располагается локально.
 {
     protected array $config;
 
@@ -23,7 +23,7 @@ class Controller
 
     protected requestAdder $requestAdder;
 
-    public function __construct(array $config, db $db, requestAdder $requestAdder)
+    public function __construct(array $config, DbInterface $db, requestAdder $requestAdder)
     {
         $this->config = $config;
         $this->db = $db;
