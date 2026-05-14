@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS requests (
+CREATE TABLE IF NOT EXISTS public.requests (
     id SERIAL PRIMARY KEY,
     brand VARCHAR(16),
     device VARCHAR(32),
@@ -11,6 +11,6 @@ CREATE TABLE IF NOT EXISTS requests (
     is_working BOOLEAN,
     working_description VARCHAR(256),
     equipment INTEGER,
-    phone VARCHAR(15),
-    name VARCHAR(20)
+    phone VARCHAR(15) NOT NULL, 
+    name VARCHAR(20) NOT NULL   
 );
