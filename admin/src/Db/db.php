@@ -27,22 +27,9 @@ class db implements DbInterface
             PDO::ATTR_EMULATE_PREPARES   => false,
         ];
 
-        try {
+        
             $this->pdo = new PDO($dsn, $user, $pass, $options);
-        } catch (PDOException $e) {
-            $errorData = [
-                'time'    => date('Y-m-d H:i:s'),
-                'level'   => 'critical',
-                'message' => 'db err',
-                'details' => $e->getMessage(),
-                'code'    => $e->getCode(),
-                'file'    => $e->getFile(),
-                'line'    => $e->getLine(),
-            ];
-
-            error_log(json_encode($errorData, JSON_UNESCAPED_UNICODE));
-            throw new dbAdminErr("dberror");
-        }
+        
     }
     public function getConnection(): PDO
     {

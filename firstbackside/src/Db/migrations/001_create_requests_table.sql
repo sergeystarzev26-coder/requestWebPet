@@ -12,5 +12,6 @@ CREATE TABLE IF NOT EXISTS public.requests (
     working_description VARCHAR(256),
     equipment INTEGER,
     phone VARCHAR(15) NOT NULL, 
-    name VARCHAR(20) NOT NULL   
+    name VARCHAR(20) NOT NULL,
+    ispause BOOLEAN DEFAULT false
 );

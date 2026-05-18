@@ -27,23 +27,7 @@ class db implements DbInterface
             PDO::ATTR_EMULATE_PREPARES   => false,
         ];
         //создание подключение к базе данных через блок try catch тк подключение к базе данных является хрупким процессом
-        try {
             $this->pdo = new PDO($dsn, $user, $pass, $options);
-        } catch (PDOException $e) {
-            //в блоке catch используется error_log для логирования ошибок. для отслеживания трейса ошибки создается массив.
-            $errorData = [
-                'time'    => date('Y-m-d H:i:s'),
-                'level'   => 'critical',
-                'message' => 'dberror',
-                'details' => $e->getMessage(),
-                'code'    => $e->getCode(),
-                'file'    => $e->getFile(),
-                'line'    => $e->getLine(),
-            ];
-
-            error_log(json_encode($errorData, JSON_UNESCAPED_UNICODE));
-            throw new DatabaseException("service error");
-        }
     }
 
     public function getConnection(): PDO

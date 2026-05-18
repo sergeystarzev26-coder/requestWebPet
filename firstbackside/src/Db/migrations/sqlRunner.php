@@ -1,6 +1,5 @@
 <?php
-$config = require_once __DIR__ . '/../config/config.php';
-// Имитация подключения к БД (замените на ваши данные или подключите ваш .env / config.php)
+$config = require __DIR__ . '/../../../config/config.php';
 $host = $config['db']['host'];
 $db   = $config['db']['dbname'];
 $user = $config['db']['user'];

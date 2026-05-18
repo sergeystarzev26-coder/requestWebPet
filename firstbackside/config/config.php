@@ -1,6 +1,6 @@
 <?php
 
-$envPath = __DIR__ . '/.env';
+$envPath = dirname(__DIR__) . '/.env';
 
 // Загружаем данные из .env в массив $_ENV
 if (file_exists($envPath)) {

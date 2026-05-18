@@ -1,4 +1,7 @@
 <?php
+set_error_handler(function ($severity, $message, $file, $line) {
+    throw new ErrorException($message, 0, $severity, $file, $line);
+});
 session_start();
 
 require_once __DIR__ . '/../vendor/autoload.php';
@@ -18,12 +21,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $controller = new AdminController($config, $dbConnection, $manager);
 
         echo $controller->execute();
-    } catch (\Exception $e) {
+    } catch (\Throwable $e) {
         http_response_code(500);
         echo json_encode([
             'status' => 'error',
-            'message' => 'Critical system error: ' . $e->getMessage()
+            'message' => 'Critical system error: '
         ]);
+        error_log("BOOTSTRAP ERROR: " . $e->getMessage() . " in " . $e->getFile() . ":" . $e->getLine());
     }
 } else {
     echo json_encode([

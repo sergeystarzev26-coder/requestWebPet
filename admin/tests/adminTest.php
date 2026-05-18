@@ -76,18 +76,30 @@ class adminTest extends TestCase
         $manage = new adminManager($Dbmock);
         $manage->unpauseRequest($dto);
     }
-    public function testRenderErr()
+       public function testRenderErr()
     {
-        $dto = new adminDto(action: 'unpause', id: 42);
+        $dto = new adminDto(action: 'delete', id: 42);
         $stmtMock = $this->createMock(\PDOStatement::class);
         $PDOmock = $this->createMock(\PDO::class);
         $Dbmock = $this->createMock(App\Db\DbInterface::class);
+        
         $Dbmock->method('getConnection')->willReturn($PDOmock);
         $PDOmock->method('prepare')->willReturn($stmtMock);
-        $stmtMock->expects($this->once())->method('execute')->with([':id' => 42])->willThrowException(new PDOException('db is dead', 500));
+        
+        // Симулируем смерть базы данных
+        $stmtMock->expects($this->once())
+            ->method('execute')
+            ->with([':id' => 42])
+            ->willThrowException(new \PDOException('db is dead'));
+
         $manage = new adminManager($Dbmock);
-        $result = $manage->deleteRequest($dto);
-        $expectedJson = json_encode(['status' => 'error', 'message' => 'dberror']);
-        $this->assertEquals($expectedJson, $result);
+
+        // ЖДЕМ, что менеджер выбросит твое кастомное исключение dbActionErr (или PDOException)
+        // Замени App\Exceptions\dbActionErr::class на точный namespace твоей ошибки
+        $this->expectException(\PDOException::class); 
+
+        // Вызываем метод. Так как он выбросит исключение, переменная $result больше не нужна
+        $manage->deleteRequest($dto);
     }
+
 }

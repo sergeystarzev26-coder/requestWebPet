@@ -13,6 +13,8 @@ use App\Exceptions\RoleErr;
 use App\Exceptions\dbActionErr;
 use App\Exceptions\dbAdminErr;
 use Exception;
+use PDOException;
+use Throwable;
 
 class AdminController
 {
@@ -95,24 +97,28 @@ class AdminController
             return $this->renderError($e, 500, 'database action error');
         } catch (dbAdminErr $e) {
             return $this->renderError($e, 500, 'database error');
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             return $this->renderError($e, 500, 'unexpected error');
+        } catch (PDOException $e){
+            return $this->renderError($e, 500, 'database error');
         }
+
     }
 
-    private function renderError(Exception $e, int $httpCode, string $publicMessage): string
+    private function renderError(Throwable $e, int $httpCode, string $publicMessage): string
     {
         if (!headers_sent()) {
             http_response_code($httpCode);
         }
 
-        $errorData = [
-            'time'    => date('Y-m-d H:i:s'),
+       $errorData = [
             'level'   => 'critical',
+            'file'    => $e->getFile(), 
+            'line'    => $e->getLine(), 
             'details' => $e->getMessage(),
         ];
 
-        error_log($publicMessage . ': ' . json_encode($errorData));
+        error_log($publicMessage . ': ' . json_encode($errorData, JSON_UNESCAPED_UNICODE));
 
         return json_encode([
             'status' => 'error',

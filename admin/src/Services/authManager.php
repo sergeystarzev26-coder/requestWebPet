@@ -22,7 +22,6 @@ class authManager
     public function auth()
     {
         $sql = 'SELECT login, password_hash FROM admins WHERE login = :login';
-        try {
             $conn = $this->db->getConnection();
             $stmt = $conn->prepare($sql);
             $succ = $stmt->execute(['login' => $this->login]);
@@ -32,20 +31,7 @@ class authManager
                     throw new authErr('verif err');
                 }
             }
-        } catch (authErr $e) {
-            $errorData = [
-                'time'    => date('Y-m-d H:i:s'),
-                'level'   => 'critical',
-                'message' => 'auth err',
-                'details' => $e->getMessage(),
-                'code'    => $e->getCode(),
-                'file'    => $e->getFile(),
-                'line'    => $e->getLine(),
-            ];
-
-            error_log(json_encode($errorData, JSON_UNESCAPED_UNICODE));
-            return false;
-        }
+        
         if (session_status() === PHP_SESSION_NONE) session_start();
         $_SESSION['auth'] = true;
         $_SESSION['is_admin'] = '1';

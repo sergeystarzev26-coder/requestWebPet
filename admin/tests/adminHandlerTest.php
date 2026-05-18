@@ -19,27 +19,25 @@ class adminHandlerTest extends TestCase
     // Тестируем битый JSON 
     public function testTakeDataInvalidJson()
     {
-        $result = adminHandler::takeDataFromPost('{ "id": 123, broken... }');
-
-        $this->assertJson($result);
-        $this->assertStringContainsString('incorrect data', $result);
+        $this->expectException(\App\Exceptions\inputErr::class);
+        $this->expectExceptionMessage('postData != Json');
+        adminHandler::takeDataFromPost('{ "id": 123, broken... }');
     }
 
     // Тестируем пустой запрос
     public function testTakeDataEmpty()
     {
+        $this->expectException(\App\Exceptions\inputErr::class);
+        $this->expectExceptionMessage('empty request');
         $result = adminHandler::takeDataFromPost('');
 
-        $this->assertJson($result);
-        $this->assertStringContainsString('incorrect data', $result);
     }
 
     // Тестируем не массив 
     public function testTakeDataNotArray()
     {
+        $this->expectException(\App\Exceptions\inputErr::class);
+        $this->expectExceptionMessage('decode Data error');
         $result = adminHandler::takeDataFromPost('12345');
-
-        $this->assertJson($result);
-        $this->assertStringContainsString('unexpected error', $result);
     }
 }
