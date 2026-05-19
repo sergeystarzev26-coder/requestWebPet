@@ -1,9 +1,6 @@
 <?php
 
 namespace App\Controllers;
-
-require_once __DIR__ . '/config.php';
-
 use App\db\db;
 use App\Db\DbInterface;
 use App\Services\requestHandler;
@@ -12,6 +9,7 @@ use App\Services\validator;
 use App\Services\requestAdder;
 use App\Exceptions\ValidationException;
 use App\Exceptions\DatabaseException;
+use App\Services\errorcathcer;
 use Exception;
 
 //класс контроллера как входная точка бизнес логики
@@ -19,7 +17,7 @@ class Controller
 {
     protected array $config;
 
-    protected db $db;
+    protected DbInterface $db;
 
     protected requestAdder $requestAdder;
 
@@ -34,44 +32,20 @@ class Controller
     public function execute(): string
     {
         try {
+            header('Content-Type: application/json; charset=utf-8');
             $data = requestHandler::takeDataFromPost();
             validator::validateData($data);
             $dto = Mapper::fromArray($data);
 
-            $dbConnection = $this->db;
-            $requestAdder = $this->requestAdder;
-            $requestAdder->addDataToDb($dto);
+            $this->requestAdder->addDataToDb($dto);
 
             return json_encode(['status' => 'success']);
         } catch (ValidationException $e) {
-            return $this->renderError($e, 403, 'incorrect data');
+            return errorcathcer::error($e, 403, 'incorrect data');
         } catch (DatabaseException $e) {
-            return $this->renderError($e, 500, 'database connection error');
+            return errorcathcer::error($e, 500, 'database connection error');
         } catch (Exception $e) {
-            return $this->renderError($e, 500, 'unexpected error');
+            return errorcathcer::error($e, 500, 'unexpected error');
         }
-    }
-
-    //метод отчета ошибок.при возникновее в блоках catch вызывается метод и передаются параметры в зависимости от ошибок
-    private function renderError(Exception $e, int $httpCode, string $publicMessage): string
-    {
-        http_response_code($httpCode);
-
-        $errorData = [
-            'time'    => date('Y-m-d H:i:s'),
-            'level'   => 'critical',
-            'message' => 'unexpected err',
-            'details' => $e->getMessage(),
-            'code'    => $e->getCode(),
-            'file'    => $e->getFile(),
-            'line'    => $e->getLine(),
-        ];
-
-        error_log(json_encode($errorData, JSON_UNESCAPED_UNICODE));
-
-        return json_encode([
-            'status'  => 'error',
-            'message' => $publicMessage
-        ]);
     }
 }

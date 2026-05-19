@@ -21,57 +21,56 @@ class adminManager
         $this->db = $db;
     }
 
-    public function getAllRequests()
+    // ИСПРАВЛЕНО: Добавлен $adminDto в аргументы, чтобы метод видел ID
+    public function Manage(adminDto $adminDto)
     {
-        $sql = 'SELECT * FROM requests ORDER BY created_at DESC';
+        $action = $adminDto->action ?? 'list';
+        switch ($action) {
+            case 'delete':  
+                $sql = 'DELETE FROM requests WHERE id = :id';
 
-        $stmt = $this->db->getConnection()->prepare($sql);
-        $stmt->execute();
+                $stmt = $this->db->getConnection()->prepare($sql);
+                // данные для отправки в БД берутся из сформированного ДТО, как и во всем последующем коде
+                $stmt->execute([
+                    ':id' => $adminDto->id,
+                ]);
+                break;
 
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
+            case 'pause':    
+                $sql = 'UPDATE requests SET ispause = true WHERE id = :id';
 
-    public function deleteRequest(adminDto $adminDto)
-    {
-        $sql = 'DELETE FROM requests WHERE id = :id';
+                $stmt = $this->db->getConnection()->prepare($sql);
+                $stmt->execute([
+                    ':id' => $adminDto->id
+                ]);
+                break;
 
-        $stmt = $this->db->getConnection()->prepare($sql);
-        //данные для отправки в БД берутся из сформированного ДТО,как и во всем последующем коде
-        $stmt->execute([
-            ':id' => $adminDto->id,
-        ]);
-    }
+            case 'unpause':    
+                $sql = 'UPDATE requests SET "ispause" = false WHERE id = :id';
 
-    public function pauseRequest(adminDto $adminDto)
-    {
-        $sql = 'UPDATE requests SET ispause = true WHERE id = :id';
+                $stmt = $this->db->getConnection()->prepare($sql);
+                $stmt->execute([
+                    ':id' => $adminDto->id,
+                ]);
+                break;
 
-        $stmt = $this->db->getConnection()->prepare($sql);
-        $stmt->execute([
-            ':id' => $adminDto->id
-        ]);
-    }
+            case 'find':    
+                $sql = 'SELECT * FROM requests WHERE id = :id';
 
-    public function unpauseRequest(adminDto $adminDto)
-    {
+                $stmt = $this->db->getConnection()->prepare($sql);
+                $stmt->execute([
+                    ':id' => $adminDto->id,
+                ]);
 
-        $sql = 'UPDATE requests SET "ispause" = false WHERE id = :id';
+                return $stmt->fetch(PDO::FETCH_ASSOC);
 
-        $stmt = $this->db->getConnection()->prepare($sql);
-        $stmt->execute([
-            ':id' => $adminDto->id,
-        ]);
-    }
+            case 'list':
+                $sql = 'SELECT * FROM requests ORDER BY created_at DESC';
 
-    public function findRequest(adminDto $adminDto)
-    {
-        $sql = 'SELECT * FROM requests WHERE id = :id';
+                $stmt = $this->db->getConnection()->prepare($sql);
+                $stmt->execute();
 
-        $stmt = $this->db->getConnection()->prepare($sql);
-        $stmt->execute([
-            ':id' => $adminDto->id,
-        ]);
-
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+                return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        }
     }
 }
