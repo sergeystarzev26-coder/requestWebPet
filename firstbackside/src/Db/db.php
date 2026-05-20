@@ -14,11 +14,11 @@ class db implements DbInterface
     public function __construct(array $config)
     {
         //создание внутренних свойств на основе конфигурации чтобы постоянно не образщаться к параметру конфига
-        $host = $config['host'];
-        $port = $config['port'];
-        $db = $config['dbname'];
-        $user = $config['user'];
-        $pass = $config['pass'];
+        $host = $config['db']['host'];
+        $port = $config['db']['port'];
+        $db = $config['db']['dbname'];
+        $user = $config['db']['user'];
+        $pass = $config['db']['pass'];
         $dsn = "pgsql:host=$host;port=$port;dbname=$db";
 
         $options = [

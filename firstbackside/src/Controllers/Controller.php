@@ -1,44 +1,27 @@
 <?php
 
 namespace App\Controllers;
-use App\db\db;
-use App\Db\DbInterface;
 use App\Services\requestHandler;
-use App\Mappers\Mapper;
-use App\Services\validator;
-use App\Services\requestAdder;
 use App\Exceptions\ValidationException;
 use App\Exceptions\DatabaseException;
 use App\Services\errorcathcer;
+use App\usecase\usecase;
 use Exception;
 
 //класс контроллера как входная точка бизнес логики
 class Controller
 {
-    protected array $config;
-
-    protected DbInterface $db;
-
-    protected requestAdder $requestAdder;
-
-    public function __construct(array $config, DbInterface $db, requestAdder $requestAdder)
+    protected usecase $usecase;
+    public function __construct(usecase $usecase)
     {
-        $this->config = $config;
-        $this->db = $db;
-        $this->requestAdder = $requestAdder;
+        $this->usecase = $usecase;
     }
-    //метод execute выполняет все необходимые методы в порядке:
-    // получение данных->валидация->создание подключения к бд->выполнение операции->отчет в формате json
+
     public function execute(): string
     {
         try {
-            header('Content-Type: application/json; charset=utf-8');
-            $data = requestHandler::takeDataFromPost();
-            validator::validateData($data);
-            $dto = Mapper::fromArray($data);
-
-            $this->requestAdder->addDataToDb($dto);
-
+            $rawdata = requestHandler::takeDataFromPost();
+            $this->usecase->execute($rawdata);
             return json_encode(['status' => 'success']);
         } catch (ValidationException $e) {
             return errorcathcer::error($e, 403, 'incorrect data');

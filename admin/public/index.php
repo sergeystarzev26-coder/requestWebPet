@@ -1,4 +1,6 @@
 <?php
+
+
 set_error_handler(function ($severity, $message, $file, $line) {
     throw new ErrorException($message, 0, $severity, $file, $line);
 });
@@ -7,7 +9,7 @@ session_start();
 require_once __DIR__ . '/../vendor/autoload.php';
 
 $config = require __DIR__ . '/../config/config.php';
-
+use App\usecases\usecase;
 use App\Controllers\AdminController;
 use App\Db\db;
 use App\Services\adminManager;
@@ -18,7 +20,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         $dbConnection = new db($config);
         $manager = new adminManager($dbConnection);
-        $controller = new AdminController($config, $dbConnection, $manager);
+        $usecase = new usecase($dbConnection, $manager);
+        $controller = new AdminController($usecase);
 
         echo $controller->execute();
     } catch (\Throwable $e) {

@@ -1,24 +1,29 @@
 <?php
+
 require_once __DIR__ . '/vendor/autoload.php';
 $config = require_once __DIR__ . '/config.php';
 
 use App\Controllers\Controller;
 use App\Services\requestAdder;
 use App\Db\db;
+use App\usecase\usecase;
 
-//Входная публичная точка входа.вызывает контроллер и отдает результат в формате JSON
+// Входная публичная точка входа. Вызывает контроллер и отдает результат в формате JSON
 try {
     header('Content-Type: application/json');
 
-    $db = new db($config['db']);
-    $requestAdder = new requestAdder($db);
-    $controller = new Controller($config, $db, $requestAdder);
-
+    $db = new db($config);
+    $manager = new requestAdder($db);
+    $usecase = new usecase($db, $manager);
+    
+    // ИСПРАВЛЕНО: Создаем экземпляр контроллера и передаем в него собранный UseCase
+    $controller = new Controller($usecase);
+    
     $response = $controller->execute();
 
     echo $response;
 } catch (\Exception $e) {
-    //отдаю код на фронтенд при ошибке.
+    // Отдаю код на фронтенд при ошибке.
     http_response_code(500);
 
     $errorData = [
@@ -30,7 +35,7 @@ try {
         'file'    => $e->getFile(),
         'line'    => $e->getLine(),
     ];
-    //логирую в формате json для удобства откладки ошибок.
+    // Логирую в формате json для удобства отладки ошибок.
     error_log(json_encode($errorData, JSON_UNESCAPED_UNICODE));
 
     echo json_encode([
