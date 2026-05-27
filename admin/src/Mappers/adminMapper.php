@@ -1,9 +1,9 @@
 <?php
 namespace App\Mappers;
-use app\Dto\adminDto;
-use app\Exceptions\inputErr;
+use App\Dto\adminDto;
+use App\Exceptions\inputErr;
 class adminMapper{
-    public static function fromArray($data) : adminDto{
+    public static function fromArray(array $data) : adminDto{
         if(empty($data['action']) || empty($data['id']) || !is_int($data['id'])){
             throw new inputErr('Missing required fields: action or id');
         }

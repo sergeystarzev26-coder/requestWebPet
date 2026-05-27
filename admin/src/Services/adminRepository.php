@@ -11,9 +11,9 @@ use PDOException;
 use Exception;
 use App\Db\DbInterface;
 
-class adminManager
+class adminRepository
 {
-    protected $db;
+    protected DbInterface $db;
 
     // Менеджер операций берет данные о текущем действии пользователя и выполняет операцию с БД
     public function __construct(DbInterface $db)

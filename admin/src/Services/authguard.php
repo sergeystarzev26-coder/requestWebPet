@@ -1,25 +1,30 @@
 <?php
 namespace App\Services;
 
-use App\Db\db;
 use App\Db\DbInterface;
+use App\Dto\loginDto;
 use App\Services\authManager;
 use App\Exceptions\AuthErr;
-class authguard{
-    protected $db;
-    protected $data;
-    public function __construct(DbInterface $db, array $data)
+
+class authguard {
+    protected DbInterface $db;
+    protected loginDto $dto;
+
+    public function __construct(DbInterface $db, loginDto $dto)
     {
         $this->db = $db;
-        $this->data = $data;
+        $this->dto = $dto;
     }
-    public function authIfNeeded(){
-        if(!empty($_SESSION['auth'])){return true;}
 
-        if(isset($this->data['login']) && isset($this->data['pass'])){
-            $auth = new authManager($this->db, $this->data);
-            return $auth->auth();
+    public function authIfNeeded() {
+        if (!empty($_SESSION['auth'])) {
+            return true;
         }
-    throw new AuthErr('input correct login or password');
+        $auth = new authManager($this->db, $this->dto);
+        
+        if ($auth->auth()) {
+            return true;
+        }
+        throw new AuthErr('input correct login or password');
     }
 }

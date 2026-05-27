@@ -8,7 +8,7 @@ use Exception;
 class adminHandler
 {
 
-    public static function takeDataFromPost(?string $source = null)
+    public static function takeDataFromPost(?string $source = null) 
     {
             $rawData = $source ?? file_get_contents('php://input');
             if (empty($rawData)) {
