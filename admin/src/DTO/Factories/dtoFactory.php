@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Dto\Factories;
 
 use App\Dto\adminDto;
@@ -6,11 +7,12 @@ use App\Dto\loginDto;
 use App\Dto\DtoInterface;
 use App\Exceptions\inputErr;
 
-class DtoFactory {
-    // Указываем строгий возвращаемый тип интерфейса
-    public static function fromArray(array $data): DtoInterface {
-        
-        // Проверка для логина
+class DtoFactory 
+{
+
+    public static function fromArray(array $data): DtoInterface 
+    {
+        // 1. Проверка и создание DTO для авторизации
         if (isset($data['login'], $data['password'])) {
             return new loginDto(
                 trim((string)$data['login']), 
@@ -18,11 +20,10 @@ class DtoFactory {
             );
         }
         
-        // Проверка для админки
         if (isset($data['id'], $data['action'])) {
             return new adminDto(
-                (int)$data['id'], 
-                trim((string)$data['action'])
+                trim((string)$data['action']),
+                (int)$data['id']
             );
         }
         

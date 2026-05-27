@@ -27,6 +27,10 @@ class usecase
         if ($dto instanceof loginDto) {
             $authGuard = new authguard($this->db, $dto);
             $authGuard->authIfNeeded();
+            echo json_encode([
+                'status' => 'success',
+                'message' => 'Auth ok'
+            ], JSON_UNESCAPED_UNICODE);
             exit;
         }
         if (!rolechecker::checkIsadmin()) {

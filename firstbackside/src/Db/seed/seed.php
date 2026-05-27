@@ -5,7 +5,7 @@ use App\Db\db;
 // Изменено на 3 уровня вверх
 $config = require __DIR__ . '/../../../config/config.php';
 try{
-    $dbConnection = (new db($config['db']))->getConnection();
+    $dbConnection = (new db($config))->getConnection();
      $sql = 'INSERT INTO public.requests (
                 brand, device, memory_count, is_new, is_repair, 
                 battery_condition, case_condition, screen_condition, 
@@ -36,7 +36,6 @@ try{
         $isNew = (bool)rand(0, 1);
         $isWorking = $isNew ? true : (rand(0, 1) === 1);
         
-        // Выносим вычисления, чтобы код в execute оставался читаемым
         $isRepair = $isNew ? false : (rand(0, 1) === 1);
         $isPause = (rand(1, 5) === 1);
 
@@ -44,7 +43,6 @@ try{
             'brand'               => $randomBrand,
             'device'              => $randomDevice,
             'memory_count'        => $memory[array_rand($memory)],
-            // ИСПРАВЛЕНО: Конвертируем bool в 1 или 0 для совместимости с PostgreSQL
             'is_new'              => $isNew ? 1 : 0,
             'is_repair'           => $isRepair ? 1 : 0,
             'battery_condition'   => $isNew ? 100 : rand(65, 98), 

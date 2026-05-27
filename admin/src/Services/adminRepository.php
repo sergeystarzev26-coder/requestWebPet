@@ -34,7 +34,8 @@ class adminRepository
                 $stmt->execute([
                     ':id' => $adminDto->id,
                 ]);
-                break;
+                if($stmt->rowCount() === 0){throw new dbActionErr('request not found');}
+                return true;
 
             case 'pause':    
                 $sql = 'UPDATE requests SET ispause = true WHERE id = :id';
@@ -43,7 +44,8 @@ class adminRepository
                 $stmt->execute([
                     ':id' => $adminDto->id
                 ]);
-                break;
+                if($stmt->rowCount() === 0){throw new dbActionErr('request not found');}
+                return true;
 
             case 'unpause':    
                 $sql = 'UPDATE requests SET "ispause" = false WHERE id = :id';
@@ -52,7 +54,8 @@ class adminRepository
                 $stmt->execute([
                     ':id' => $adminDto->id,
                 ]);
-                break;
+                if($stmt->rowCount() === 0){throw new dbActionErr('request not found');}
+                return true;
 
             case 'find':    
                 $sql = 'SELECT * FROM requests WHERE id = :id';
@@ -61,11 +64,11 @@ class adminRepository
                 $stmt->execute([
                     ':id' => $adminDto->id,
                 ]);
-
+                if($stmt->rowCount() === 0){throw new dbActionErr('request not found');}
                 return $stmt->fetch(PDO::FETCH_ASSOC);
 
             case 'list':
-                $sql = 'SELECT * FROM requests ORDER BY created_at DESC';
+                $sql = 'SELECT * FROM requests ORDER BY id DESC';
 
                 $stmt = $this->db->getConnection()->prepare($sql);
                 $stmt->execute();

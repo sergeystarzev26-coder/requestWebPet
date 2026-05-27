@@ -27,7 +27,6 @@ class authManager
         
         if ($succ) {
             $res = $stmt->fetch(PDO::FETCH_ASSOC);
-            
             if (!$res || !password_verify($this->dto->password, $res['password_hash'])) {
                 throw new AuthErr('verif err');
             }
