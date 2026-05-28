@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html lang="ru">
+<style>
+    /* Общие стили */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        /* Очень тёмный и мягкий градиент фона */
+        background: linear-gradient(135deg, #4a1515 0%, #3d1a2e 50%, #3a1525 100%);
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+    }
+
+    .container {
+        background: rgba(30, 30, 35, 0.97);
+        backdrop-filter: blur(15px);
+        border-radius: 30px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 5px 15px rgba(0, 0, 0, 0.3);
+        padding: 40px;
+        max-width: 600px;
+        width: 100%;
+        animation: slideIn 0.5s ease-out;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    h1 {
+        text-align: center;
+        /* Приглушённый красный */
+        background: linear-gradient(135deg, #b71c1c, #7f0000);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        margin-bottom: 30px;
+        font-size: 28px;
+        font-weight: 600;
+    }
+
+    /* Индикатор прогресса */
+    .progress-bar {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 40px;
+    }
+
+    .progress-step {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #2a2a2f;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        color: #666;
+        transition: all 0.3s ease;
+        position: relative;
+    }
+
+    .progress-step.active {
+        background: linear-gradient(135deg, #b71c1c, #7f0000);
+        color: #e0e0e0;
+        transform: scale(1.1);
+        box-shadow: 0 4px 15px rgba(183, 28, 28, 0.3);
+    }
+
+    .progress-step.completed {
+        background: linear-gradient(135deg, #1a3a1a, #1b4d1b);
+        color: #ccc;
+    }
+
+    .progress-step.completed::after {
+        content: '✓';
+        position: absolute;
+        font-size: 20px;
+    }
+
+    .progress-line {
+        flex: 1;
+        height: 3px;
+        background: #2a2a2f;
+        margin: 0 10px;
+        transition: background 0.3s ease;
+    }
+
+    .progress-line.completed {
+        background: linear-gradient(90deg, #1a3a1a, #1b4d1b);
+    }
+
+    /* Шаги формы */
+    .form-step {
+        display: none;
+        animation: fadeIn 0.4s ease-out;
+    }
+
+    .form-step.active {
+        display: block;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateX(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    /* Поля формы */
+    fieldset {
+        border: 1px solid #3a2025;
+        border-radius: 20px;
+        padding: 25px;
+        margin-bottom: 25px;
+        transition: all 0.3s ease;
+        background: rgba(40, 35, 38, 0.6);
+    }
+
+    fieldset:hover {
+        border-color: #5a2d35;
+        background: rgba(45, 38, 42, 0.8);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    legend {
+        font-size: 18px;
+        font-weight: 600;
+        background: linear-gradient(135deg, #c62828, #8e0000);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        padding: 0 10px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+        position: relative;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        color: #aaa;
+        font-weight: 500;
+        font-size: 14px;
+    }
+
+    .form-group-checkbox {
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .form-group-checkbox label {
+        color: #aaa;
+        font-weight: 500;
+        font-size: 14px;
+        cursor: pointer;
+    }
+
+    .required {
+        color: #d32f2f;
+        margin-left: 2px;
+    }
+
+    input[type="text"],
+    input[type="tel"],
+    input[type="number"],
+    select,
+    textarea {
+        width: 100%;
+        padding: 12px 15px;
+        border: 1px solid #3a3a40;
+        border-radius: 15px;
+        font-size: 14px;
+        transition: all 0.3s ease;
+        background: #2a2a30;
+        color: #ccc;
+        font-family: inherit;
+    }
+
+    input[type="text"]::placeholder,
+    input[type="tel"]::placeholder,
+    input[type="number"]::placeholder,
+    select::placeholder,
+    textarea::placeholder {
+        color: #666;
+    }
+
+    input[type="text"]:focus,
+    input[type="tel"]:focus,
+    input[type="number"]:focus,
+    select:focus,
+    textarea:focus {
+        outline: none;
+        border-color: #c62828;
+        background: #2f2f36;
+        color: #e0e0e0;
+        box-shadow: 0 0 0 3px rgba(198, 40, 40, 0.15);
+    }
+
+    input[type="text"].error,
+    input[type="tel"].error,
+    input[type="number"].error,
+    select.error,
+    textarea.error {
+        border-color: #c62828;
+        background: #2f1f1f;
+    }
+
+    input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        cursor: pointer;
+        accent-color: #b71c1c;
+    }
+
+    textarea {
+        resize: vertical;
+        min-height: 80px;
+    }
+
+    select {
+        cursor: pointer;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23c62828' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 15px center;
+        padding-right: 40px;
+    }
+
+    select option {
+        background: #2a2a30;
+        color: #ccc;
+    }
+
+    .checkbox-group {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+    }
+
+    .checkbox-group label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        color: #aaa;
+        font-size: 14px;
+    }
+
+    .checkbox-label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 8px;
+        cursor: pointer;
+        color: #999;
+        font-size: 13px;
+    }
+
+    /* Сообщения об ошибках */
+    .error-message {
+        color: #ef5350;
+        font-size: 12px;
+        margin-top: 5px;
+        min-height: 18px;
+        opacity: 0;
+        transform: translateY(-10px);
+        transition: all 0.3s ease;
+    }
+
+    .error-message.show {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    /* Счётчики символов */
+    .char-counter {
+        text-align: right;
+        color: #777;
+        font-size: 12px;
+        margin-top: 5px;
+    }
+
+    /* Кнопки */
+    .next-step-btn,
+    .prev-step-btn,
+    .submit-btn {
+        padding: 12px 30px;
+        border: none;
+        border-radius: 50px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        letter-spacing: 0.5px;
+    }
+
+    .next-step-btn,
+    .submit-btn {
+        background: linear-gradient(135deg, #8b0000, #5a0000);
+        color: #ddd;
+        float: right;
+        box-shadow: 0 4px 10px rgba(139, 0, 0, 0.3);
+    }
+
+    .next-step-btn:hover,
+    .submit-btn:hover {
+        background: linear-gradient(135deg, #a00000, #6e0000);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(139, 0, 0, 0.4);
+        color: #fff;
+    }
+
+    .next-step-btn:active,
+    .submit-btn:active {
+        transform: translateY(0);
+    }
+
+    .prev-step-btn {
+        background: #2a2a2f;
+        color: #888;
+        float: left;
+        border: 1px solid #3a3a40;
+    }
+
+    .prev-step-btn:hover {
+        background: #353540;
+        color: #bbb;
+        transform: translateY(-2px);
+        border-color: #5a2d35;
+    }
+
+    .step-buttons {
+        overflow: hidden;
+        margin-top: 20px;
+    }
+
+    /* Блокированная секция */
+    .disabled-section {
+        opacity: 0.4;
+        pointer-events: none;
+        position: relative;
+    }
+
+    .disabled-section::after {
+        content: '✓ Новое устройство';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: linear-gradient(135deg, #1a3a1a, #1b4d1b);
+        color: #ccc;
+        padding: 8px 18px;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 14px;
+        z-index: 10;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+        border: 1px solid #2a4a2a;
+    }
+
+    /* Уведомления */
+    .notification {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 15px 25px;
+        border-radius: 15px;
+        color: #ddd;
+        font-weight: 500;
+        z-index: 1000;
+        opacity: 0;
+        transform: translateX(100%);
+        transition: all 0.4s ease;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        max-width: 400px;
+    }
+
+    .notification.show {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    .notification.error {
+        background: linear-gradient(135deg, #5a0000, #3d0000);
+        border: 1px solid #8b0000;
+    }
+
+    .notification.warning {
+        background: linear-gradient(135deg, #4a2500, #3a1a00);
+        border: 1px solid #6b3500;
+    }
+
+    .notification.success {
+        background: linear-gradient(135deg, #1a3a1a, #0d2b0d);
+        border: 1px solid #2a4a2a;
+    }
+
+    /* Сообщение об успехе */
+    #successMessage {
+        text-align: center;
+        padding: 40px 20px;
+        animation: slideIn 0.6s ease-out;
+    }
+
+    #successMessage h2 {
+        background: linear-gradient(135deg, #2e7d32, #1b5e20);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        font-size: 32px;
+        margin-bottom: 20px;
+    }
+
+    #successMessage p {
+        color: #999;
+        font-size: 16px;
+    }
+
+    /* Адаптивность */
+    @media (max-width: 768px) {
+        .container {
+            padding: 25px;
+            margin: 10px;
+        }
+
+        h1 {
+            font-size: 24px;
+        }
+
+        fieldset {
+            padding: 18px;
+        }
+
+        .checkbox-group {
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .next-step-btn,
+        .prev-step-btn,
+        .submit-btn {
+            padding: 10px 20px;
+            font-size: 13px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .container {
+            padding: 20px;
+        }
+
+        h1 {
+            font-size: 20px;
+        }
+
+        .progress-step {
+            width: 30px;
+            height: 30px;
+            font-size: 12px;
+        }
+
+        input[type="text"],
+        input[type="tel"],
+        input[type="number"],
+        select,
+        textarea {
+            padding: 10px 12px;
+            font-size: 13px;
+        }
+    }
+</style>
+</head>
+<body>
+    <div class="container">
+        <h1>Форма приёма устройства</h1>
+        
+        <!-- Индикатор прогресса -->
+        <div class="progress-bar">
+            <div class="progress-step active" data-step="1">1</div>
+            <div class="progress-line"></div>
+            <div class="progress-step" data-step="2">2</div>
+            <div class="progress-line"></div>
+            <div class="progress-step" data-step="3">3</div>
+        </div>
+        
+        <form id="intakeForm">
+            <!-- Этап 1: Основная матрица -->
+            <div class="form-step active" data-step="1">
+                <fieldset>
+                    <legend>Основная матрица</legend>
+                    
+                    <div class="form-group">
+                        <label for="brand">Бренд: <span class="required">*</span></label>
+                        <select id="brand" name="brand" required>
+                            <option value="">Выберите бренд</option>
+                            <option value="Apple">Apple</option>
+                            <option value="Samsung">Samsung</option>
+                            <option value="Xiaomi">Xiaomi</option>
+                            <option value="OPPO">OPPO</option>
+                            <option value="Vivo">Vivo</option>
+                            <option value="Huawei">Huawei</option>
+                            <option value="Realme">Realme</option>
+                            <option value="OnePlus">OnePlus</option>
+                            <option value="Google">Google</option>
+                            <option value="Motorola">Motorola</option>
+                            <option value="Sony">Sony</option>
+                            <option value="Nokia">Nokia</option>
+                            <option value="ASUS">ASUS</option>
+                            <option value="Nothing">Nothing</option>
+                            <option value="Honor">Honor</option>
+                        </select>
+                        <div class="error-message" id="brand-error"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="device">Устройство: <span class="required">*</span></label>
+                        <input type="text" id="device" name="device" list="deviceList" placeholder="Выберите или введите своё устройство" maxlength="32" required autocomplete="off">
+                        <datalist id="deviceList"></datalist>
+                        <div class="error-message" id="device-error"></div>
+                        <small class="hint">Если вашей модели нет в списке, просто введите её название</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="memory_count">Объём памяти (ГБ): <span class="required">*</span></label>
+                        <select id="memory_count" name="memory_count" required>
+                            <option value="">Выберите объём памяти</option>
+                            <option value="64">64 ГБ</option>
+                            <option value="128">128 ГБ</option>
+                            <option value="256">256 ГБ</option>
+                            <option value="512">512 ГБ</option>
+                            <option value="1024">1024 ГБ (1 ТБ)</option>
+                            <option value="2048">2048 ГБ (2 ТБ)</option>
+                        </select>
+                        <div class="error-message" id="memory-error"></div>
+                    </div>
+
+                    <div class="form-group-checkbox">
+                        <label for="is_new">Новое устройство:</label>
+                        <input type="checkbox" id="is_new" name="is_new">
+                    </div>
+                </fieldset>
+                <button type="button" class="next-step-btn" data-next="2">Далее</button>
+            </div>
+
+            <!-- Этап 2: Диагностика -->
+            <div class="form-step" data-step="2">
+                <fieldset id="diagnosticSection">
+                    <legend>Диагностика</legend>
+
+                    <div class="form-group">
+                        <label for="battery_condition">Заряд батареи % (0-100): <span class="required">*</span></label>
+                        <input type="number" id="battery_condition" name="battery_condition" min="0" max="100" required>
+                        <div class="error-message" id="battery-error"></div>
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="battery_unknown"> Я не знаю уровень заряда
+                        </label>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="case_condition">Состояние корпуса: <span class="required">*</span></label>
+                        <select id="case_condition" name="case_condition" required>
+                            <option value="">Выберите состояние</option>
+                            <option value="Новый">Новый</option>
+                            <option value="Есть небольшие царапины">Есть небольшие царапины</option>
+                            <option value="Есть большие царапины">Есть большие царапины</option>
+                            <option value="Разбит">Разбит</option>
+                        </select>
+                        <div class="error-message" id="case-error"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="screen_condition">Состояние экрана: <span class="required">*</span></label>
+                        <select id="screen_condition" name="screen_condition" required>
+                            <option value="">Выберите состояние</option>
+                            <option value="Новый">Новый</option>
+                            <option value="Есть небольшие царапины">Есть небольшие царапины</option>
+                            <option value="Есть большие царапины">Есть большие царапины</option>
+                            <option value="Разбит">Разбит</option>
+                        </select>
+                        <div class="error-message" id="screen-error"></div>
+                    </div>
+
+                    <div class="form-group-checkbox">
+    <label for="is_working">Работает (если не отмечено, опишите проблему ниже):</label>
+    <input type="checkbox" id="is_working" name="is_working" checked>
+    <div class="error-message" id="working-error"></div>
+</div>
+
+<div class="form-group">
+    <label for="working_description">Описание работы или проблемы:</label>
+    <textarea id="working_description" name="working_description" maxlength="256" rows="3" placeholder="Опишите состояние работы или проблему"></textarea>
+    <div class="char-counter" id="desc-counter">0/256</div>
+</div>
+                </fieldset>
+                <div class="step-buttons">
+                    <button type="button" class="prev-step-btn" data-prev="1">Назад</button>
+                    <button type="button" class="next-step-btn" data-next="3">Далее</button>
+                </div>
+            </div>
+
+            <!-- Этап 3: Данные владельца -->
+            <div class="form-step" data-step="3">
+                <fieldset>
+                    <legend>Данные владельца</legend>
+
+                    <div class="form-group">
+                        <label>Комплектация:</label>
+                        <div class="checkbox-group">
+                            <label><input type="checkbox" class="equipment-checkbox" data-code="1"> Чек</label>
+                            <label><input type="checkbox" class="equipment-checkbox" data-code="2"> Коробка</label>
+                            <label><input type="checkbox" class="equipment-checkbox" data-code="3"> Зарядное устройство</label>
+                        </div>
+                    </div>
+
+                    <div class="form-group-checkbox">
+                        <label for="is_repair">устройство ремонтировалось?:</label>
+                        <input type="checkbox" id="is_repair" name="is_repair">
+                        <div class="error-message" id="repair-error"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="name">Ваше имя: <span class="required">*</span></label>
+                        <input type="text" id="name" name="name" placeholder="Имя" maxlength="20" required>
+                        <div class="error-message" id="name-error"></div>
+                        <div class="char-counter" id="name-counter">0/20</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phone">Телефон: <span class="required">*</span></label>
+                        <input type="tel" id="phone" name="phone" placeholder="Телефон" maxlength="15" required>
+                        <div class="error-message" id="phone-error"></div>
+                        <div class="char-counter" id="phone-counter">0/15</div>
+                    </div>
+                </fieldset>
+                <div class="step-buttons">
+                    <button type="button" class="prev-step-btn" data-prev="2">Назад</button>
+                    <button type="submit" class="submit-btn">Отправить</button>
+                </div>
+            </div>
+        </form>
+
+        <!-- Уведомления -->
+        <div class="notification" id="notification"></div>
+
+        <!-- Сообщение об успехе -->
+        <div id="successMessage" style="display:none;">
+            <h2>✓ Артефакт сохранён</h2>
+            <p>Система приняла данные устройства.</p>
+        </div>
+    </div>
+
+    <style>
+        /* Добавленные стили для подсказки */
+        .hint {
+            display: block;
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        /* Стили для необязательных полей */
+        .form-group-checkbox label {
+            font-weight: normal;
+        }
+        
+        .form-group-checkbox .error-message {
+            margin-top: 5px;
+        }
+    </style>
+
+    <script>
+        const brandDevices = {
+    "Apple": [
+        "iPhone 17 Pro Max", "iPhone 17 Pro", "iPhone 17", "iPhone 17e",
+        "iPhone 16 Pro Max", "iPhone 16 Pro", "iPhone 16 Plus", "iPhone 16",
+        "iPhone SE 4",
+        "iPhone 15 Pro Max", "iPhone 15 Pro", "iPhone 15 Plus", "iPhone 15",
+        "iPhone 14 Pro Max", "iPhone 14 Pro", "iPhone 14 Plus", "iPhone 14",
+        "iPhone 13 Pro Max", "iPhone 13 Pro", "iPhone 13", "iPhone 13 mini",
+        "iPhone SE (3-го поколения)",
+        "iPhone 12 Pro Max", "iPhone 12 Pro", "iPhone 12", "iPhone 12 mini",
+        "iPhone 11 Pro Max", "iPhone 11 Pro", "iPhone 11",
+        "iPhone XS Max", "iPhone XS", "iPhone XR", "iPhone X",
+        "iPhone 8 Plus", "iPhone 8",
+        "iPhone 7 Plus", "iPhone 7",
+        "iPhone 6s Plus", "iPhone 6s", "iPhone 6 Plus", "iPhone 6",
+        "iPhone SE (2-го поколения)",
+        "iPhone 5s", "iPhone 5c", "iPhone 5",
+        "iPhone 4S", "iPhone 4",
+        "iPhone 3GS", "iPhone 3G",
+        "iPhone",
+        "iPhone SE (1-го поколения)"
+    ],
+    "Samsung": [
+        "Galaxy S26 Ultra", "Galaxy S26+", "Galaxy S26",
+        "Galaxy S25 Ultra", "Galaxy S25+", "Galaxy S25",
+        "Galaxy Z Fold 7", "Galaxy Z Flip 7",
+        "Galaxy A56 5G",
+        "Galaxy S24 Ultra", "Galaxy S24+", "Galaxy S24",
+        "Galaxy Z Fold 6", "Galaxy Z Flip 6",
+        "Galaxy S23 Ultra", "Galaxy S23+", "Galaxy S23", "Galaxy S23 FE",
+        "Galaxy Z Fold 5", "Galaxy Z Flip 5",
+        "Galaxy S22 Ultra", "Galaxy S22+", "Galaxy S22",
+        "Galaxy Z Fold 4", "Galaxy Z Flip 4",
+        "Galaxy S21 Ultra", "Galaxy S21+", "Galaxy S21", "Galaxy S21 FE",
+        "Galaxy Z Fold 3", "Galaxy Z Flip 3",
+        "Galaxy S20 Ultra", "Galaxy S20+", "Galaxy S20", "Galaxy S20 FE",
+        "Galaxy Z Fold 2", "Galaxy Z Flip", "Galaxy Fold",
+        "Galaxy Note 20 Ultra", "Galaxy Note 20",
+        "Galaxy S10 5G", "Galaxy S10+", "Galaxy S10", "Galaxy S10e", "Galaxy S10 Lite",
+        "Galaxy Note 10+", "Galaxy Note 10", "Galaxy Note 10 Lite",
+        "Galaxy S9+", "Galaxy S9",
+        "Galaxy Note 9",
+        "Galaxy S8+", "Galaxy S8",
+        "Galaxy Note 8"
+    ],
+    "Xiaomi": [
+        "Xiaomi 17 Pro", "Xiaomi 17",
+        "Xiaomi 16 Ultra", "Xiaomi 16 Pro", "Xiaomi 16",
+        "Xiaomi 15 Ultra", "Xiaomi 15 Pro", "Xiaomi 15",
+        "Redmi Note 15 Pro", "Redmi Note 15",
+        "Xiaomi 14 Ultra", "Xiaomi 14 Pro", "Xiaomi 14",
+        "Redmi Note 14 Pro+", "Redmi Note 14 Pro", "Redmi Note 14",
+        "Xiaomi 13 Ultra", "Xiaomi 13 Pro", "Xiaomi 13", "Xiaomi 13 Lite",
+        "Xiaomi 13T Pro", "Xiaomi 13T",
+        "Redmi Note 13 Pro+", "Redmi Note 13 Pro", "Redmi Note 13",
+        "Xiaomi 12T Pro", "Xiaomi 12T",
+        "Xiaomi 12 Pro", "Xiaomi 12", "Xiaomi 12 Lite",
+        "Xiaomi 11T Pro", "Xiaomi 11T",
+        "Xiaomi Mi 11 Ultra", "Xiaomi Mi 11", "Xiaomi Mi 11 Lite"
+    ],
+    "OPPO": [
+        "OPPO Find X9 Ultra", "OPPO Find X9",
+        "OPPO Reno 13 Pro", "OPPO Reno 13",
+        "OPPO Find X8 Ultra", "OPPO Find X8", "OPPO Find X8 Pro",
+        "OPPO Find N5", "OPPO Find N5 Flip",
+        "OPPO Reno 12 Pro", "OPPO Reno 12",
+        "OPPO Find X7 Ultra", "OPPO Find X7",
+        "OPPO Find N3 Flip", "OPPO Find N3",
+        "OPPO Find X6 Pro", "OPPO Find X6",
+        "OPPO Reno 11 Pro", "OPPO Reno 11",
+        "OPPO Find N2 Flip",
+        "OPPO Find X5 Pro", "OPPO Find X5",
+        "OPPO Reno 10 Pro+", "OPPO Reno 10 Pro", "OPPO Reno 10",
+        "OPPO Reno 9 Pro+", "OPPO Reno 9 Pro", "OPPO Reno 9",
+        "OPPO Reno 8 Pro", "OPPO Reno 8"
+    ],
+    "Vivo": [
+        "Vivo X300 Pro", "Vivo X300",
+        "Vivo V50 Pro", "Vivo V50",
+        "Vivo X200 Ultra", "Vivo X200 Pro Max", "Vivo X200 Pro", "Vivo X200",
+        "Vivo X Fold 5 Pro",
+        "Vivo V40 Pro", "Vivo V40",
+        "Vivo X100 Ultra", "Vivo X100 Pro", "Vivo X100",
+        "Vivo X Fold 3 Pro", "Vivo X Fold 3",
+        "Vivo V30 Pro", "Vivo V30",
+        "Vivo X90 Pro+", "Vivo X90 Pro", "Vivo X90",
+        "Vivo X Fold 2",
+        "Vivo V29 Pro", "Vivo V29",
+        "Vivo X80 Pro", "Vivo X80"
+    ],
+    "Huawei": [
+        "Huawei Pura 90 Ultra", "Huawei Pura 90 Pro", "Huawei Pura 90",
+        "Huawei Mate 80 Pro", "Huawei Mate 80",
+        "Huawei Mate XT Ultimate",
+        "Huawei Pura 80 Ultra", "Huawei Pura 80 Pro", "Huawei Pura 80",
+        "Huawei Mate 70 Pro", "Huawei Mate 70",
+        "Huawei Pura 70 Ultra", "Huawei Pura 70 Pro+", "Huawei Pura 70 Pro", "Huawei Pura 70",
+        "Huawei Pocket 3",
+        "Huawei Mate X6",
+        "Huawei P60 Pro", "Huawei P60", "Huawei P60 Art",
+        "Huawei Mate 60 Pro+", "Huawei Mate 60 Pro", "Huawei Mate 60",
+        "Huawei Mate X5",
+        "Huawei Pocket 2",
+        "Huawei P50 Pro", "Huawei P50", "Huawei P50 Pocket",
+        "Huawei Mate 50 Pro", "Huawei Mate 50", "Huawei Mate 50 RS Porsche Design",
+        "Huawei Mate X3", "Huawei Mate Xs 2"
+    ],
+    "Realme": [
+        "Realme GT 8 Pro", "Realme GT 8",
+        "Realme 14 Pro+", "Realme 14 Pro",
+        "Realme GT 7 Pro", "Realme GT 7",
+        "Realme 13 Pro+", "Realme 13 Pro",
+        "Realme GT 6", "Realme GT 6 Pro",
+        "Realme 12 Pro+", "Realme 12 Pro", "Realme 12+", "Realme 12",
+        "Realme GT 5 Pro", "Realme GT 5",
+        "Realme 11 Pro+", "Realme 11 Pro", "Realme 11",
+        "Realme GT Neo 5", "Realme GT Neo 5 SE",
+        "Realme GT 3",
+        "Realme 10 Pro+", "Realme 10 Pro", "Realme 10",
+        "Realme GT 2 Pro", "Realme GT 2",
+        "Realme 9 Pro+", "Realme 9 Pro", "Realme 9"
+    ],
+    "OnePlus": [
+        "OnePlus 14", "OnePlus 14R",
+        "OnePlus Ace 5", "OnePlus Ace 5 Pro",
+        "OnePlus 13", "OnePlus 13R",
+        "OnePlus Open 2",
+        "OnePlus Ace 3 Pro",
+        "OnePlus 12", "OnePlus 12R",
+        "OnePlus Ace 3",
+        "OnePlus Open",
+        "OnePlus 11", "OnePlus 11R",
+        "OnePlus Nord 4", "OnePlus Nord 3",
+        "OnePlus Ace 2",
+        "OnePlus 10 Pro", "OnePlus 10T", "OnePlus 10R",
+        "OnePlus Nord CE 4", "OnePlus Nord CE 3",
+        "OnePlus 9 Pro", "OnePlus 9", "OnePlus 9R",
+        "OnePlus 8 Pro", "OnePlus 8T", "OnePlus 8"
+    ],
+    "Google": [
+        "Google Pixel 11 Pro", "Google Pixel 11",
+        "Google Pixel 10a",
+        "Google Pixel 10 Pro", "Google Pixel 10",
+        "Google Pixel 9a",
+        "Google Pixel 9 Pro XL", "Google Pixel 9 Pro", "Google Pixel 9",
+        "Google Pixel 8a",
+        "Google Pixel 8 Pro", "Google Pixel 8",
+        "Pixel Fold",
+        "Google Pixel 7a",
+        "Google Pixel 7 Pro", "Google Pixel 7",
+        "Google Pixel 6a",
+        "Google Pixel 6 Pro", "Google Pixel 6",
+        "Google Pixel 5a", "Google Pixel 5",
+        "Google Pixel 4a 5G", "Google Pixel 4a",
+        "Google Pixel 4 XL", "Google Pixel 4",
+        "Google Pixel 3a XL", "Google Pixel 3a",
+        "Google Pixel 3 XL", "Google Pixel 3",
+        "Google Pixel 2 XL", "Google Pixel 2",
+        "Google Pixel XL", "Google Pixel"
+    ],
+    "Motorola": [
+        "Motorola Edge 70 Ultra", "Motorola Edge 70 Pro", "Motorola Edge 70",
+        "Motorola Razr 60 Ultra", "Motorola Razr 60",
+        "Motorola Edge 60 Ultra", "Motorola Edge 60 Pro", "Motorola Edge 60",
+        "Motorola Razr 50 Ultra",
+        "Motorola Edge 50 Ultra", "Motorola Edge 50 Pro", "Motorola Edge 50 Fusion",
+        "Motorola Razr 40 Ultra", "Motorola Razr 40",
+        "Motorola Edge 40 Pro", "Motorola Edge 40", "Motorola Edge 40 Neo",
+        "Motorola Edge 30 Ultra", "Motorola Edge 30 Pro", "Motorola Edge 30 Fusion", "Motorola Edge 30 Neo",
+        "Motorola Moto G85", "Motorola Moto G84", "Motorola Moto G73",
+        "Motorola Moto G64", "Motorola Moto G54", "Motorola Moto G53",
+        "Motorola Moto G34", "Motorola Moto G24", "Motorola Moto G14"
+    ],
+    "Sony": [
+        "Sony Xperia 1 VIII", "Sony Xperia 10 VIII",
+        "Sony Xperia 1 VII", "Sony Xperia 5 VII", "Sony Xperia 10 VII",
+        "Sony Xperia 1 VI", "Sony Xperia 10 VI",
+        "Sony Xperia 1 V", "Sony Xperia 5 V", "Sony Xperia 10 V",
+        "Sony Xperia 1 IV", "Sony Xperia 5 IV", "Sony Xperia 10 IV",
+        "Sony Xperia 1 III", "Sony Xperia 5 III", "Sony Xperia 10 III",
+        "Sony Xperia Pro-I"
+    ],
+    "Nokia": [
+        "HMD Skyline 2",
+        "HMD Fusion 2",
+        "HMD Skyline",
+        "HMD Fusion",
+        "Nokia 3210 5G",
+        "HMD Crest Max",
+        "Nokia G42", "Nokia G22", "Nokia G11",
+        "Nokia G60", "Nokia X30",
+        "Nokia XR21", "Nokia XR20",
+        "Nokia X20", "Nokia X10",
+        "Nokia C32", "Nokia C22", "Nokia C12",
+        "Nokia C02", "Nokia C01 Plus",
+        "Nokia 2780 Flip", "Nokia 2660 Flip",
+        "Nokia 8210 4G", "Nokia 5710 XpressAudio",
+        "Nokia 110 4G", "Nokia 105 4G"
+    ],
+    "ASUS": [
+        "ASUS ROG Phone 10 Pro",
+        "ASUS Zenfone 13 Ultra",
+        "ASUS ROG Phone 9 Pro",
+        "ASUS Zenfone 12 Ultra",
+        "ASUS ROG Phone 8 Pro", "ASUS ROG Phone 8",
+        "ASUS Zenfone 11 Ultra",
+        "ASUS ROG Phone 7 Ultimate", "ASUS ROG Phone 7",
+        "ASUS Zenfone 10",
+        "ASUS ROG Phone 6 Pro", "ASUS ROG Phone 6",
+        "ASUS Zenfone 9"
+    ],
+    "Nothing": [
+        "Nothing Phone (4)",
+        "Nothing Phone (3a) Pro", "Nothing Phone (3a)",
+        "Nothing Phone (3)",
+        "Nothing Phone (2a) Plus",
+        "Nothing Phone (2a)",
+        "Nothing Phone (2)",
+        "Nothing Phone (1)"
+    ],
+    "Honor": [
+        "Honor Magic8 Pro", "Honor Magic8",
+        "Honor 400 Pro", "Honor 400",
+        "Honor Magic7 Pro", "Honor Magic7",
+        "Honor Magic V4",
+        "Honor 300 Pro", "Honor 300",
+        "Honor Magic6 Pro", "Honor Magic6", "Honor Magic6 Lite",
+        "Honor Magic V3", "Honor Magic V2", "Honor Magic Vs2",
+        "Honor 200 Pro", "Honor 200",
+        "Honor Magic V Purse",
+        "Honor 90", "Honor 90 Lite"
+    ]
+};
+
+        const brandSelect = document.getElementById('brand');
+        const deviceInput = document.getElementById('device');
+        const deviceList = document.getElementById('deviceList');
+        const batteryInput = document.getElementById('battery_condition');
+        const batteryUnknown = document.getElementById('battery_unknown');
+        const isNewCheckbox = document.getElementById('is_new');
+        const diagnosticSection = document.getElementById('diagnosticSection');
+        const form = document.getElementById('intakeForm');
+        const successMessage = document.getElementById('successMessage');
+        const notification = document.getElementById('notification');
+
+        let currentStep = 1;
+        const totalSteps = 3;
+
+        // Функция показа уведомления
+        function showNotification(message, type = 'error') {
+            notification.textContent = message;
+            notification.className = `notification ${type} show`;
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // Функция показа ошибки поля
+        function showFieldError(elementId, message) {
+            const errorElement = document.getElementById(elementId);
+            const inputElement = document.getElementById(elementId.replace('-error', ''));
+            
+            if (message) {
+                errorElement.textContent = message;
+                errorElement.classList.add('show');
+                if (inputElement) {
+                    inputElement.classList.add('error');
+                }
+            } else {
+                errorElement.textContent = '';
+                errorElement.classList.remove('show');
+                if (inputElement) {
+                    inputElement.classList.remove('error');
+                }
+            }
+        }
+
+        // Функция переключения шагов
+        function switchStep(stepNumber) {
+            document.querySelectorAll('.form-step').forEach(step => {
+                step.classList.remove('active');
+            });
+            document.querySelector(`.form-step[data-step="${stepNumber}"]`).classList.add('active');
+
+            document.querySelectorAll('.progress-step').forEach(step => {
+                step.classList.remove('active');
+                if (parseInt(step.dataset.step) < stepNumber) {
+                    step.classList.add('completed');
+                } else if (parseInt(step.dataset.step) === stepNumber) {
+                    step.classList.add('active');
+                } else {
+                    step.classList.remove('completed');
+                }
+            });
+
+            currentStep = stepNumber;
+        }
+
+        // Валидация этапа 1
+        function validateStep1() {
+            let isValid = true;
+            const brand = brandSelect.value;
+            const device = deviceInput.value.trim();
+            const memory = document.getElementById('memory_count').value;
+
+            if (!brand) {
+                showFieldError('brand-error', 'Выберите бренд устройства');
+                isValid = false;
+            } else {
+                showFieldError('brand-error', '');
+            }
+
+            if (!device) {
+                showFieldError('device-error', 'Введите название устройства');
+                isValid = false;
+            } else if (device.length < 2) {
+                showFieldError('device-error', 'Название устройства слишком короткое');
+                isValid = false;
+            } else {
+                showFieldError('device-error', '');
+            }
+
+            if (!memory) {
+                showFieldError('memory-error', 'Выберите объём памяти');
+                isValid = false;
+            } else {
+                showFieldError('memory-error', '');
+            }
+
+            return isValid;
+        }
+
+        // Валидация этапа 2 (is_working больше НЕ обязателен)
+        function validateStep2() {
+            if (isNewCheckbox.checked) {
+                return true;
+            }
+
+            let isValid = true;
+            const caseCondition = document.getElementById('case_condition').value;
+            const screenCondition = document.getElementById('screen_condition').value;
+
+            if (!caseCondition) {
+                showFieldError('case-error', 'Выберите состояние корпуса');
+                isValid = false;
+            } else {
+                showFieldError('case-error', '');
+            }
+
+            if (!screenCondition) {
+                showFieldError('screen-error', 'Выберите состояние экрана');
+                isValid = false;
+            } else {
+                showFieldError('screen-error', '');
+            }
+
+            // Валидация заряда батареи (осталась обязательной)
+            if (!batteryUnknown.checked && !batteryInput.value) {
+                showFieldError('battery-error', 'Укажите заряд батареи или отметьте "Я не знаю"');
+                isValid = false;
+            } else if (!batteryUnknown.checked && batteryInput.value) {
+                const batteryValue = parseInt(batteryInput.value);
+                if (batteryValue < 0 || batteryValue > 100) {
+                    showFieldError('battery-error', 'Заряд батареи должен быть от 0 до 100');
+                    isValid = false;
+                } else {
+                    showFieldError('battery-error', '');
+                }
+            } else {
+                showFieldError('battery-error', '');
+            }
+
+            return isValid;
+        }
+
+        // Валидация этапа 3 (is_repair больше НЕ обязателен)
+        function validateStep3() {
+            let isValid = true;
+            const name = document.getElementById('name').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+
+            if (!name) {
+                showFieldError('name-error', 'Введите ваше имя');
+                isValid = false;
+            } else if (name.length < 2) {
+                showFieldError('name-error', 'Имя должно содержать минимум 2 символа');
+                isValid = false;
+            } else {
+                showFieldError('name-error', '');
+            }
+
+            if (!phone) {
+                showFieldError('phone-error', 'Введите номер телефона');
+                isValid = false;
+            } else if (!/^[\d\+\-\(\)\s]{5,15}$/.test(phone)) {
+                showFieldError('phone-error', 'Введите корректный номер телефона');
+                isValid = false;
+            } else {
+                showFieldError('phone-error', '');
+            }
+
+            return isValid;
+        }
+
+        // Обработчики кнопок навигации
+        document.querySelectorAll('.next-step-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const nextStep = parseInt(btn.dataset.next);
+                let isValid = true;
+
+                if (currentStep === 1) {
+                    isValid = validateStep1();
+                } else if (currentStep === 2) {
+                    isValid = validateStep2();
+                }
+
+                if (isValid) {
+                    switchStep(nextStep);
+                } else {
+                    showNotification('Пожалуйста, исправьте ошибки в форме', 'warning');
+                }
+            });
+        });
+
+        document.querySelectorAll('.prev-step-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const prevStep = parseInt(btn.dataset.prev);
+                switchStep(prevStep);
+            });
+        });
+
+        // Обновление списка устройств при смене бренда
+        brandSelect.addEventListener('change', () => {
+            const brand = brandSelect.value;
+            deviceList.innerHTML = '';
+            // НЕ очищаем поле deviceInput.value, чтобы пользователь мог оставить своё значение
+            showFieldError('device-error', '');
+            
+            if (brand && brandDevices[brand]) {
+                brandDevices[brand].forEach(device => {
+                    const option = document.createElement('option');
+                    option.value = device;
+                    deviceList.appendChild(option);
+                });
+            }
+        });
+
+        // Мгновенная валидация при вводе
+        deviceInput.addEventListener('input', () => {
+            const value = deviceInput.value.trim();
+            if (value && value.length < 2) {
+                showFieldError('device-error', 'Название устройства слишком короткое');
+            } else {
+                showFieldError('device-error', '');
+            }
+        });
+
+        document.getElementById('name').addEventListener('input', function() {
+            const value = this.value.trim();
+            document.getElementById('name-counter').textContent = `${value.length}/20`;
+            if (value && value.length < 2) {
+                showFieldError('name-error', 'Имя должно содержать минимум 2 символа');
+            } else {
+                showFieldError('name-error', '');
+            }
+        });
+
+        document.getElementById('phone').addEventListener('input', function() {
+            const value = this.value.trim();
+            document.getElementById('phone-counter').textContent = `${value.length}/15`;
+            if (value && !/^[\d\+\-\(\)\s]{5,15}$/.test(value)) {
+                showFieldError('phone-error', 'Введите корректный номер телефона');
+            } else {
+                showFieldError('phone-error', '');
+            }
+        });
+
+        document.getElementById('working_description').addEventListener('input', function() {
+            document.getElementById('desc-counter').textContent = `${this.value.length}/256`;
+        });
+
+        // Блокировка поля заряда при "не знаю"
+        batteryUnknown.addEventListener('change', () => {
+            if (batteryUnknown.checked) {
+                batteryInput.value = '';
+                batteryInput.disabled = true;
+                batteryInput.required = false;
+                showFieldError('battery-error', '');
+            } else {
+                batteryInput.disabled = false;
+                batteryInput.required = true;
+            }
+        });
+
+        // Блокировка всей диагностики при новом устройстве
+        isNewCheckbox.addEventListener('change', () => {
+            const allInputs = diagnosticSection.querySelectorAll('input, select, textarea');
+            
+            if (isNewCheckbox.checked) {
+                diagnosticSection.classList.add('disabled-section');
+                allInputs.forEach(input => {
+                    if (input.id !== 'battery_unknown') {
+                        input.disabled = true;
+                        input.required = false;
+                    }
+                });
+                document.getElementById('case_condition').value = 'Новый';
+                document.getElementById('screen_condition').value = 'Новый';
+                document.getElementById('working_description').value = '';
+                batteryInput.value = 100;
+                
+                // Очищаем все ошибки диагностики
+                ['battery-error', 'case-error', 'screen-error', 'working-error'].forEach(id => {
+                    showFieldError(id, '');
+                });
+            } else {
+                diagnosticSection.classList.remove('disabled-section');
+                allInputs.forEach(input => {
+                    input.disabled = false;
+                    if (input.id === 'battery_condition' || input.id === 'case_condition' || 
+                        input.id === 'screen_condition') {
+                        input.required = true;
+                    }
+                    // is_working больше не делаем required
+                    if (input.id === 'is_working') {
+                        input.required = false;
+                    }
+                });
+                document.getElementById('case_condition').value = '';
+                document.getElementById('screen_condition').value = '';
+                document.getElementById('working_description').value = '';
+                batteryInput.value = '';
+                batteryUnknown.checked = false;
+            }
+        });
+
+        // Ограничение заряда 0-100
+        batteryInput.addEventListener('input', () => {
+            let val = parseInt(batteryInput.value);
+            if (isNaN(val)) return;
+            if (val < 0) batteryInput.value = 0;
+            if (val > 100) batteryInput.value = 100;
+            
+            if (val < 0 || val > 100) {
+                showFieldError('battery-error', 'Заряд батареи должен быть от 0 до 100');
+            } else {
+                showFieldError('battery-error', '');
+            }
+        });
+
+        // Отправка формы
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            if (!validateStep3()) {
+                showNotification('Пожалуйста, исправьте ошибки в форме', 'warning');
+                return;
+            }
+
+            const brandValue = document.getElementById('brand').value;
+            const deviceValue = document.getElementById('device').value.trim();
+            const memoryValue = document.getElementById('memory_count').value;
+            const caseValue = document.getElementById('case_condition').value;
+            const screenValue = document.getElementById('screen_condition').value;
+            const nameValue = document.getElementById('name').value.trim();
+            const phoneValue = document.getElementById('phone').value.trim();
+
+            const equipmentCheckboxes = document.querySelectorAll('.equipment-checkbox:checked');
+            let equipmentSum = 0;
+            equipmentCheckboxes.forEach(cb => {
+                equipmentSum += parseInt(cb.dataset.code);
+            });
+
+            let batteryValue;
+            if (isNewCheckbox.checked) {
+                batteryValue = 100;
+            } else {
+                batteryValue = batteryUnknown.checked ? 11 : parseInt(batteryInput.value);
+            }
+
+            const memoryCount = parseInt(memoryValue) || 0;
+
+            const payload = {
+                brand: brandValue,
+                device: deviceValue.substring(0, 32),
+                memory_count: memoryCount,
+                battery_condition: batteryValue,
+                is_new: isNewCheckbox.checked,
+                is_repair: document.getElementById('is_repair').checked,  // теперь необязательный
+                is_working: document.getElementById('is_working').checked, // теперь необязательный
+                case_condition: caseValue || 'Новый',
+                screen_condition: screenValue || 'Новый',
+                working_description: document.getElementById('working_description').value.trim().substring(0, 256),
+                equipment: equipmentSum,
+                phone: phoneValue.substring(0, 15),
+                name: nameValue.substring(0, 20)
+            };
+
+            try {
+                const response = await fetch('http://localhost/code/requestWebPet/firstbackside/public/index.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json; charset=utf-8'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Ошибка сервера: ${response.status}`);
+                }
+
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    form.style.display = 'none';
+                    document.querySelector('.progress-bar').style.display = 'none';
+                    successMessage.style.display = 'block';
+                    showNotification('Данные успешно отправлены!', 'success');
+                } else {
+                    showNotification('Ошибка сохранения данных', 'error');
+                }
+            } catch (error) {
+                console.error('Ошибка:', error);
+                showNotification('Ошибка соединения с сервером', 'error');
+            }
+        });
+    </script>
+</body>
+</html>

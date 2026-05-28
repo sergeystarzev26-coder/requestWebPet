@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Панель управления заявками</title>
+    <style>
+        :root {
+            --bg: #0a0a0a;
+            --surface: #111111;
+            --border: #222222;
+            --text: #888888;
+            --text-bright: #cccccc;
+            --accent: #2a2a2a;
+            --accent-hover: #333333;
+            --danger: #3a1818;
+            --danger-text: #cc5555;
+            --success-bg: #1a2a1a;
+            --success-text: #55cc55;
+            --warning-bg: #2a2a1a;
+            --warning-text: #cccc55;
+            --primary: #1a2a3a;
+            --primary-text: #5599cc;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', 'Courier New', monospace;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            padding: 20px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            gap: 20px;
+        }
+
+        .main-content {
+            min-width: 0;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            color: var(--text-bright);
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            color: var(--text-bright);
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input, select {
+            width: 100%;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            color: var(--text-bright);
+            padding: 10px 12px;
+            font-size: 13px;
+            outline: none;
+            transition: all 0.2s;
+            font-family: monospace;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--primary-text);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--accent);
+            border: 1px solid var(--border);
+            color: var(--text-bright);
+            padding: 8px 16px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-family: monospace;
+        }
+
+        .btn:hover {
+            background: var(--accent-hover);
+            border-color: var(--text-bright);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: var(--primary-text);
+            border-color: var(--primary-text);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-text);
+            color: var(--bg);
+        }
+
+        .btn-danger {
+            color: var(--danger-text);
+            border-color: #3a1818;
+        }
+
+        .btn-danger:hover {
+            background: var(--danger);
+            color: var(--danger-text);
+            border-color: var(--danger-text);
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 11px;
+        }
+
+        .toolbar {
+            display: flex;
+            gap: 12px;
+            align-items: flex-end;
+            flex-wrap: wrap;
+        }
+
+        .toolbar .form-group {
+            margin-bottom: 0;
+            flex: 1;
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .filter-group select {
+            flex: 1;
+            font-size: 12px;
+        }
+
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            margin-top: 15px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 12px;
+        }
+
+        th, td {
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            color: var(--text-bright);
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: rgba(255,255,255,0.02);
+            cursor: pointer;
+            user-select: none;
+        }
+
+        th:hover {
+            background: rgba(255,255,255,0.05);
+        }
+
+        tr:hover td {
+            background: rgba(255,255,255,0.02);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .badge-active {
+            background: var(--success-bg);
+            color: var(--success-text);
+        }
+        .badge-paused {
+            background: var(--warning-bg);
+            color: var(--warning-text);
+        }
+
+        #alertBox {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text-bright);
+            z-index: 1000;
+            font-size: 12px;
+            font-family: monospace;
+        }
+        #alertBox.error {
+            border-color: var(--danger-text);
+            background: #1a0808;
+            color: var(--danger-text);
+        }
+        #alertBox.success {
+            border-color: var(--success-text);
+            background: #081a08;
+            color: var(--success-text);
+        }
+
+        #authScreen {
+            max-width: 400px;
+            margin: 80px auto 0 auto;
+        }
+
+        .notepad {
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+        }
+
+        .notepad textarea {
+            width: 100%;
+            height: 500px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            color: var(--text-bright);
+            padding: 15px;
+            font-size: 12px;
+            font-family: monospace;
+            resize: vertical;
+            outline: none;
+            line-height: 1.5;
+        }
+
+        .notepad textarea:focus {
+            border-color: var(--primary-text);
+        }
+
+        .notepad-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .stats {
+            font-size: 11px;
+            color: var(--text);
+            margin-top: 10px;
+            text-align: right;
+        }
+
+        .resize-handle {
+            height: 4px;
+            background: var(--border);
+            cursor: ns-resize;
+            margin-top: 10px;
+            transition: background 0.2s;
+        }
+
+        .resize-handle:hover {
+            background: var(--primary-text);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="main-content">
+        <div id="alertBox" class="hidden"></div>
+
+        <!-- ЭКРАН 1: Авторизация -->
+        <div id="authScreen" class="card">
+            <h2>[🔐] АВТОРИЗАЦИЯ</h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label>ЛОГИН</label>
+                    <input type="text" id="username" placeholder="admin" autocomplete="off" required>
+                </div>
+                <div class="form-group">
+                    <label>ПАРОЛЬ</label>
+                    <input type="password" id="password" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">[→] ВОЙТИ</button>
+            </form>
+        </div>
+
+        <!-- ЭКРАН 2: Рабочая панель -->
+        <div id="adminScreen" class="hidden">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2>[📋] УПРАВЛЕНИЕ ЗАЯВКАМИ</h2>
+                <button id="logoutBtn" class="btn btn-danger btn-sm">[🚪] ВЫЙТИ</button>
+            </div>
+
+            <div class="card">
+                <div class="toolbar">
+                    <div class="form-group">
+                        <label>[🔍] ПОИСК ПО ID</label>
+                        <input type="number" id="searchId" placeholder="Введите ID...">
+                    </div>
+                    <button id="searchBtn" class="btn">[🔎] НАЙТИ</button>
+                    <button id="resetBtn" class="btn btn-primary">[📋] ВСЕ ЗАЯВКИ</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="filter-group">
+                    <select id="filterStatus">
+                        <option value="all">[📊] ВСЕ СТАТУСЫ</option>
+                        <option value="active">[▶] АКТИВНЫЕ</option>
+                        <option value="paused">[⏸] НА ПАУЗЕ</option>
+                    </select>
+                    <select id="filterBrand">
+                        <option value="all">[🏭] ВСЕ БРЕНДЫ</option>
+                        <option value="Apple">🍎 Apple</option>
+                        <option value="Samsung">📱 Samsung</option>
+                        <option value="Xiaomi">📲 Xiaomi</option>
+                        <option value="OPPO">📷 OPPO</option>
+                        <option value="Vivo">🎵 Vivo</option>
+                        <option value="Huawei">📡 Huawei</option>
+                        <option value="Realme">⚡ Realme</option>
+                        <option value="OnePlus">🚀 OnePlus</option>
+                        <option value="Google">🔍 Google</option>
+                        <option value="Motorola">📞 Motorola</option>
+                        <option value="Sony">🎮 Sony</option>
+                        <option value="Nokia">💪 Nokia</option>
+                        <option value="ASUS">🖥️ ASUS</option>
+                        <option value="Nothing">✨ Nothing</option>
+                        <option value="Honor">🏆 Honor</option>
+                    </select>
+                    <select id="filterMemory">
+                        <option value="all">[💾] ВСЯ ПАМЯТЬ</option>
+                        <option value="64">64 GB</option>
+                        <option value="128">128 GB</option>
+                        <option value="256">256 GB</option>
+                        <option value="512">512 GB</option>
+                        <option value="1024">1024 GB</option>
+                        <option value="2048">2048 GB</option>
+                    </select>
+                    <select id="filterWorking">
+                        <option value="all">[⚙] ВСЕ СОСТОЯНИЯ</option>
+                        <option value="working">[✓] РАБОТАЕТ</option>
+                        <option value="broken">[✗] НЕ РАБОТАЕТ</option>
+                    </select>
+                </div>
+                <div class="table-wrapper">
+                    <table id="dataTable">
+                        <thead id="tableHead"></thead>
+                        <tbody id="tableBody"></tbody>
+                    </table>
+                </div>
+                <div class="stats" id="tableStats"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Блокнот -->
+    <div class="notepad" id="notepad">
+        <div class="card" style="margin-bottom: 0;">
+            <div class="notepad-header">
+                <h2>[📝] ЗАМЕТКИ</h2>
+                <div>
+                    <button id="saveNoteBtn" class="btn btn-sm" style="margin-right: 5px;">[💾] СОХРАНИТЬ</button>
+                    <button id="clearNoteBtn" class="btn btn-sm btn-danger">[🗑] ОЧИСТИТЬ</button>
+                </div>
+            </div>
+            <textarea id="notepadContent" placeholder="[✏] Введите ваши заметки по заявкам...
+
+[!] ПРИМЕРЫ:
+Заявка 1232 - ждет ответа от клиента
+Заявка 4567 - требуется замена диска
+Заявка 8910 - ожидается подтверждение"></textarea>
+            <div class="resize-handle" id="resizeHandle"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const API_URL = './index.php';
+    
+    let allRequests = [];
+    let currentSort = { column: 'id', direction: 'asc' };
+    let currentFilters = {
+        status: 'all',
+        brand: 'all',
+        memory: 'all',
+        working: 'all'
+    };
+
+    const authScreen = document.getElementById('authScreen');
+    const adminScreen = document.getElementById('adminScreen');
+    const loginForm = document.getElementById('loginForm');
+    const tableHead = document.getElementById('tableHead');
+    const tableBody = document.getElementById('tableBody');
+    const alertBox = document.getElementById('alertBox');
+    const searchIdInput = document.getElementById('searchId');
+    const searchBtn = document.getElementById('searchBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const filterStatus = document.getElementById('filterStatus');
+    const filterBrand = document.getElementById('filterBrand');
+    const filterMemory = document.getElementById('filterMemory');
+    const filterWorking = document.getElementById('filterWorking');
+    const notepadContent = document.getElementById('notepadContent');
+    const saveNoteBtn = document.getElementById('saveNoteBtn');
+    const clearNoteBtn = document.getElementById('clearNoteBtn');
+    const tableStats = document.getElementById('tableStats');
+    const textarea = document.getElementById('notepadContent');
+
+    let alertTimeout;
+
+    function printNotification(message, isError = false) {
+        clearTimeout(alertTimeout);
+        alertBox.textContent = `[!] ${message}`;
+        alertBox.className = isError ? 'error' : 'success';
+        alertBox.classList.remove('hidden');
+        alertTimeout = setTimeout(() => {
+            alertBox.classList.add('hidden');
+        }, 4000);
+    }
+
+    async function request(payload) {
+        try {
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json; charset=utf-8' },
+                credentials: 'include',
+                body: JSON.stringify(payload)
+            });
+            const result = await response.json();
+            if (!response.ok || result.status === 'error') {
+                throw new Error(result.message || `Ошибка: ${response.status}`);
+            }
+            return result;
+        } catch (error) {
+            printNotification(error.message, true);
+            if (error.message.includes('403')) routeToAuth();
+            throw error;
+        }
+    }
+
+    function routeToAdmin() {
+        authScreen.classList.add('hidden');
+        adminScreen.classList.remove('hidden');
+        loadNotepad();
+    }
+
+    function routeToAuth() {
+        adminScreen.classList.add('hidden');
+        authScreen.classList.remove('hidden');
+    }
+
+    function parseBool(value) {
+        if (value === true || value === 1 || value === "1" || value === "true") return "ДА";
+        if (value === false || value === 0 || value === "0" || value === "false") return "НЕТ";
+        return value || "—";
+    }
+
+    function translateColumnName(col) {
+        const map = {
+            'id': 'ID',
+            'login': 'ЛОГИН',
+            'ispause': 'СТАТУС',
+            'brand': 'БРЕНД',
+            'memory': 'ПАМЯТЬ',
+            'is_working': 'СОСТОЯНИЕ',
+            'status': 'СТАТУС',
+            'username': 'ЛОГИН',
+            'created_at': 'ДАТА СОЗД.',
+            'updated_at': 'ДАТА ОБН.',
+            'email': 'EMAIL',
+            'phone': 'ТЕЛЕФОН'
+        };
+        return map[col.toLowerCase()] || col.toUpperCase();
+    }
+
+    function formatValue(col, val) {
+        if (col.toLowerCase() === 'ispause') {
+            return val === true || val === 1 || val === "1" || val === "true"
+                ? '<span class="badge badge-paused">[⏸] НА ПАУЗЕ</span>'
+                : '<span class="badge badge-active">[▶] АКТИВНА</span>';
+        }
+        if (col.toLowerCase() === 'is_working') {
+            return val === true || val === 1 || val === "1" || val === "true"
+                ? '<span style="color: #55cc55;">[✓] РАБОТАЕТ</span>'
+                : '<span style="color: #cc5555;">[✗] НЕ РАБОТАЕТ</span>';
+        }
+        if (typeof val === 'boolean') return parseBool(val);
+        
+        // Добавляем иконки для брендов при отображении
+        if (col.toLowerCase() === 'brand') {
+            const brandIcons = {
+                'Apple': '🍎',
+                'Samsung': '📱',
+                'Xiaomi': '📲',
+                'OPPO': '📷',
+                'Vivo': '🎵',
+                'Huawei': '📡',
+                'Realme': '⚡',
+                'OnePlus': '🚀',
+                'Google': '🔍',
+                'Motorola': '📞',
+                'Sony': '🎮',
+                'Nokia': '💪',
+                'ASUS': '🖥️',
+                'Nothing': '✨',
+                'Honor': '🏆'
+            };
+            const icon = brandIcons[val] || '📱';
+            return `${icon} ${val}`;
+        }
+        
+        return val !== null && val !== undefined ? String(val) : '—';
+    }
+
+    function applyFilters() {
+        let filtered = [...allRequests];
+        
+        if (currentFilters.status === 'active') {
+            filtered = filtered.filter(r => !(r.ispause === true || r.ispause === 1 || r.ispause === "1" || r.ispause === "true"));
+        } else if (currentFilters.status === 'paused') {
+            filtered = filtered.filter(r => (r.ispause === true || r.ispause === 1 || r.ispause === "1" || r.ispause === "true"));
+        }
+        
+        if (currentFilters.brand !== 'all' && currentFilters.brand) {
+            filtered = filtered.filter(r => String(r.brand || '').toLowerCase() === currentFilters.brand.toLowerCase());
+        }
+        
+        if (currentFilters.memory !== 'all' && currentFilters.memory) {
+            filtered = filtered.filter(r => String(r.memory || '') === currentFilters.memory);
+        }
+        
+        if (currentFilters.working === 'working') {
+            filtered = filtered.filter(r => r.is_working === true || r.is_working === 1 || r.is_working === "1");
+        } else if (currentFilters.working === 'broken') {
+            filtered = filtered.filter(r => !(r.is_working === true || r.is_working === 1 || r.is_working === "1"));
+        }
+        
+        return filtered;
+    }
+
+    function sortData(data) {
+        return [...data].sort((a, b) => {
+            let aVal = a[currentSort.column];
+            let bVal = b[currentSort.column];
+            
+            if (typeof aVal === 'boolean') aVal = aVal ? 1 : 0;
+            if (typeof bVal === 'boolean') bVal = bVal ? 1 : 0;
+            
+            if (aVal < bVal) return currentSort.direction === 'asc' ? -1 : 1;
+            if (aVal > bVal) return currentSort.direction === 'asc' ? 1 : -1;
+            return 0;
+        });
+    }
+
+    function updateUniqueFilters(data) {
+        const brands = new Set();
+        
+        data.forEach(item => {
+            if (item.brand) brands.add(String(item.brand));
+        });
+        
+        // Сохраняем предустановленные бренды + добавляем новые из данных
+        const presetBrands = ["Apple", "Samsung", "Xiaomi", "OPPO", "Vivo", "Huawei", "Realme", "OnePlus", "Google", "Motorola", "Sony", "Nokia", "ASUS", "Nothing", "Honor"];
+        presetBrands.forEach(b => brands.add(b));
+        
+        const brandIcons = {
+            'Apple': '🍎', 'Samsung': '📱', 'Xiaomi': '📲', 'OPPO': '📷', 'Vivo': '🎵',
+            'Huawei': '📡', 'Realme': '⚡', 'OnePlus': '🚀', 'Google': '🔍', 'Motorola': '📞',
+            'Sony': '🎮', 'Nokia': '💪', 'ASUS': '🖥️', 'Nothing': '✨', 'Honor': '🏆'
+        };
+        
+        filterBrand.innerHTML = '<option value="all">[🏭] ВСЕ БРЕНДЫ</option>' + 
+            Array.from(brands).sort().map(b => {
+                const icon = brandIcons[b] || '📱';
+                return `<option value="${b}">${icon} ${b}</option>`;
+            }).join('');
+    }
+
+    function renderTable() {
+        let filtered = applyFilters();
+        const sorted = sortData(filtered);
+        
+        tableStats.innerHTML = `[📊] ПОКАЗАНО: ${sorted.length} ИЗ ${allRequests.length} ЗАЯВОК`;
+        
+        if (sorted.length === 0) {
+            tableHead.innerHTML = '';
+            tableBody.innerHTML = '<tr><td colspan="10" style="text-align:center; padding: 40px;">[📭] ЗАЯВКИ НЕ НАЙДЕНЫ</td></tr>';
+            return;
+        }
+        
+        const columns = Object.keys(sorted[0]);
+        
+        tableHead.innerHTML = '<tr>' + columns.map(col => `
+            <th onclick="sortByColumn('${col}')">
+                ${translateColumnName(col)}
+                ${currentSort.column === col ? (currentSort.direction === 'asc' ? '▲' : '▼') : ''}
+            </th>
+        `).join('') + '<th>[⚡] ДЕЙСТВИЯ</th></tr>';
+        
+        tableBody.innerHTML = sorted.map(row => {
+            const isPaused = row.ispause === true || row.ispause === 1 || row.ispause === "1" || row.ispause === "true";
+            return '<tr>' + columns.map(col => {
+                const val = row[col];
+                const formatted = formatValue(col, val);
+                return `<td>${formatted}</td>`;
+            }).join('') + `
+                <td>
+                    <button class="btn btn-sm" onclick="dispatchAction(${row.id}, '${isPaused ? 'unpause' : 'pause'}')">
+                        ${isPaused ? '[▶] СНЯТЬ' : '[⏸] ПАУЗА'}
+                    </button>
+                    <button class="btn btn-sm btn-danger" onclick="dispatchAction(${row.id}, 'delete')">
+                        [🗑] УДАЛИТЬ
+                    </button>
+                </td>
+            </tr>`;
+        }).join('');
+    }
+
+    window.sortByColumn = function(column) {
+        if (currentSort.column === column) {
+            currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+        } else {
+            currentSort.column = column;
+            currentSort.direction = 'asc';
+        }
+        renderTable();
+    };
+
+    window.dispatchAction = async function(id, actionName) {
+        const strictId = parseInt(id, 10);
+        try {
+            const res = await request({ id: strictId, action: actionName });
+            if (res.status === 'success' && res.data === true) {
+                const messages = { 'pause': 'НА ПАУЗУ', 'unpause': 'АКТИВИРОВАНА', 'delete': 'УДАЛЕНА' };
+                printNotification(`[✓] ЗАЯВКА #${strictId} ${messages[actionName] || 'ОБРАБОТАНА'}`);
+                await loadList();
+            }
+        } catch (err) {
+            printNotification(`[✗] ОШИБКА ПРИ ОБРАБОТКЕ #${strictId}`, true);
+        }
+    };
+
+    async function loadList() {
+        try {
+            const res = await request({ id: 0, action: 'list' });
+            allRequests = Array.isArray(res.data) ? res.data : [res.data];
+            updateUniqueFilters(allRequests);
+            renderTable();
+        } catch (err) {}
+    }
+
+    searchBtn.addEventListener('click', async () => {
+        const idInt = parseInt(searchIdInput.value, 10);
+        if (isNaN(idInt)) {
+            printNotification('[⚠] ВВЕДИТЕ КОРРЕКТНЫЙ ID', true);
+            return;
+        }
+        try {
+            const res = await request({ id: idInt, action: 'find' });
+            allRequests = Array.isArray(res.data) ? res.data : [res.data];
+            renderTable();
+            printNotification(`[🔍] РЕЗУЛЬТАТ ПОИСКА ПО ID: ${idInt}`);
+        } catch (err) {
+            printNotification(`[✗] ЗАЯВКА #${idInt} НЕ НАЙДЕНА`, true);
+        }
+    });
+
+    resetBtn.addEventListener('click', () => {
+        searchIdInput.value = '';
+        loadList();
+        printNotification('[🔄] ПОКАЗАНЫ ВСЕ ЗАЯВКИ');
+    });
+
+    filterStatus.addEventListener('change', () => {
+        currentFilters.status = filterStatus.value;
+        renderTable();
+    });
+
+    filterBrand.addEventListener('change', () => {
+        currentFilters.brand = filterBrand.value;
+        renderTable();
+    });
+
+    filterMemory.addEventListener('change', () => {
+        currentFilters.memory = filterMemory.value;
+        renderTable();
+    });
+
+    filterWorking.addEventListener('change', () => {
+        currentFilters.working = filterWorking.value;
+        renderTable();
+    });
+
+    loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        try {
+            await request({
+                login: document.getElementById('username').value,
+                password: document.getElementById('password').value
+            });
+            printNotification('[✓] АВТОРИЗАЦИЯ УСПЕШНА');
+            routeToAdmin();
+            await loadList();
+        } catch (err) {
+            printNotification('[✗] ОШИБКА ВХОДА', true);
+        }
+    });
+
+    logoutBtn.addEventListener('click', () => {
+        routeToAuth();
+        printNotification('[👋] ВЫХОД ИЗ СИСТЕМЫ');
+    });
+
+    function saveNotepad() {
+        localStorage.setItem('admin_notepad', notepadContent.value);
+        printNotification('[💾] ЗАМЕТКИ СОХРАНЕНЫ');
+    }
+
+    function loadNotepad() {
+        const saved = localStorage.getItem('admin_notepad');
+        if (saved) notepadContent.value = saved;
+    }
+
+    saveNoteBtn.addEventListener('click', saveNotepad);
+    
+    clearNoteBtn.addEventListener('click', () => {
+        if (confirm('ОЧИСТИТЬ ВСЕ ЗАМЕТКИ?')) {
+            notepadContent.value = '';
+            saveNotepad();
+        }
+    });
+
+    // Изменение размера блокнота
+    let isResizing = false;
+    let startY, startHeight;
+    const resizeHandle = document.getElementById('resizeHandle');
+
+    resizeHandle.addEventListener('mousedown', function(e) {
+        isResizing = true;
+        startY = e.clientY;
+        startHeight = textarea.offsetHeight;
+        document.body.style.cursor = 'ns-resize';
+        e.preventDefault();
+    });
+
+    document.addEventListener('mousemove', function(e) {
+        if (!isResizing) return;
+        const delta = e.clientY - startY;
+        const newHeight = startHeight + delta;
+        if (newHeight > 200 && newHeight < 800) {
+            textarea.style.height = newHeight + 'px';
+        }
+    });
+
+    document.addEventListener('mouseup', function() {
+        if (isResizing) {
+            isResizing = false;
+            document.body.style.cursor = '';
+            localStorage.setItem('notepad_height', textarea.style.height);
+        }
+    });
+
+    const savedHeight = localStorage.getItem('notepad_height');
+    if (savedHeight) {
+        textarea.style.height = savedHeight;
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+        request({ id: 0, action: 'list' })
+            .then(res => {
+                allRequests = Array.isArray(res.data) ? res.data : [res.data];
+                routeToAdmin();
+                renderTable();
+                updateUniqueFilters(allRequests);
+                loadNotepad();
+            })
+            .catch(() => routeToAuth());
+    });
+</script>
+</body>
+</html>

@@ -55,7 +55,7 @@ class validator
         }
 
         $phone = $deviceData['phone'] ?? '';
-        if (!is_string($phone) || empty($phone) || mb_strlen($phone) > 15) {
+        if (!is_string($phone) || empty($phone) || mb_strlen($phone) > 20) {
             throw new ValidationException('Incorrect userPhone');
         }
 
@@ -65,7 +65,7 @@ class validator
         }
 
         $equipment = $deviceData['equipment'] ?? null;
-        if (!is_numeric($equipment) || $equipment < 0 || $equipment > 10) {
+        if (!is_numeric($equipment) || $equipment < 0 || $equipment > 90) {
             throw new ValidationException('Incorrect equipment');
         }
 

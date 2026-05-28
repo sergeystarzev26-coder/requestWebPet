@@ -16,26 +16,34 @@ class usecase
 {
     protected DbInterface $db;
     protected adminRepository $manager;
+
     public function __construct(DbInterface $db, adminRepository $manager)
     {
         $this->db = $db;
         $this->manager = $manager;
     }
+
     public function execute(array $data)
     {
         $dto = DtoFactory::fromArray($data);
+        
+        // 1. Если прилетел логин — проверяем пароль и выходим из метода (Early Return)
         if ($dto instanceof loginDto) {
+            if (session_status() === PHP_SESSION_NONE) {
+                session_start();
+            }
+            $_SESSION = []; // Очищаем всё внутри сессии
             $authGuard = new authguard($this->db, $dto);
             $authGuard->authIfNeeded();
-            echo json_encode([
-                'status' => 'success',
-                'message' => 'Auth ok'
-            ], JSON_UNESCAPED_UNICODE);
-            exit;
+            return true; // Передаем управление в контроллер, проверка пройдена
         }
+        
+        // 2. Если это любой другой бизнес-запрос — строго проверяем сессию админа
         if (!rolechecker::checkIsadmin()) {
             throw new RoleErr('role error');
         }
+        
+        // 3. Выполняем действие в БД (list, find, pause, unpause, delete)
         return $this->manager->Manage($dto);
     }
 }

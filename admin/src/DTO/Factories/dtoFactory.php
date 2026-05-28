@@ -12,7 +12,6 @@ class DtoFactory
 
     public static function fromArray(array $data): DtoInterface 
     {
-        // 1. Проверка и создание DTO для авторизации
         if (isset($data['login'], $data['password'])) {
             return new loginDto(
                 trim((string)$data['login']), 
